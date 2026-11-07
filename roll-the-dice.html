@@ -171,7 +171,7 @@ function finish(){
  open=false;render();clearSave();document.getElementById('over').hidden=false;
 }
 function ui(){
- const cup=document.getElementById('cup');cup.disabled=busy||rolls>=3||order.length==5;document.getElementById('cl').textContent=rolls==0?'Roll':'Roll again';
+ const cup=document.getElementById('cup');cup.disabled=busy||rolls>=3||order.length==5;document.getElementById('cl').textContent=rolls==0?'Roll':'Roll';
  document.getElementById('info').textContent=busy?'Rolling…':order.length==5?'All dice kept. The scorecard will open shortly.':rolls==0?(NP==1?'Shake the cup to start your turn.':NAMES[cur]+', shake the cup to start your turn.'):rolls<3?(3-rolls)+' roll'+(3-rolls>1?'s':'')+' left. Tap dice to keep them, then roll again, or slide up the scorecard to score.':'No rolls left. Pick a score on the scorecard.';
 }
 function pot(d,i){
