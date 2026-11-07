@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Shut the Box</title>
+<style>
+:root{--bg:#efeadb;--ink:#201c14;--card:#fffaf0;--line:#d9d0b8;--hi:#ffe6a0;--felt:#117040;--felt2:#094a29;--wood:#5a3418;--gold:#e2b94a;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15130f;--ink:#f0e9d6;--card:#211d15;--line:#3d3626;--hi:#4b3f16;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#15130f;--ink:#f0e9d6;--card:#211d15;--line:#3d3626;--hi:#4b3f16;color-scheme:dark}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 Georgia,"Times New Roman",serif}
+#app{max-width:460px;margin:0 auto;padding:10px 10px 100px}
+.top{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.pl{flex:1 1 40%;min-width:0;padding:8px 10px;border-radius:10px;border:2px solid var(--line);background:var(--card);display:flex;justify-content:space-between;align-items:baseline}
+.pl.on{border-color:var(--gold);background:var(--hi)}
+.pl span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:6px}.pl b{font-size:1.2em}
+.wood{background:linear-gradient(180deg,#7a4a24,#5a3418);border:4px solid #3a200c;border-radius:16px;padding:12px 8px;box-shadow:0 4px 10px #0005,inset 0 2px 4px #fff3;perspective:600px;margin-bottom:10px}
+#box{display:grid;grid-template-columns:repeat(var(--n,9),1fr);gap:3px}#box.big{gap:6px}#box.big .t{aspect-ratio:1/1.8;font-size:1.4em}
+.t{aspect-ratio:1/1.9;border-radius:5px 5px 3px 3px;background:linear-gradient(180deg,#e6c27a,#c99a4b);color:#3a200c;font:700 1.25em Georgia,serif;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 3px 0 #8a5a22,0 5px 6px #0006;transform-origin:50% 100%;transition:transform .5s,filter .5s,box-shadow .3s;user-select:none;-webkit-tap-highlight-color:transparent}
+.t.shut{transform:rotateX(30deg);filter:brightness(.5);box-shadow:0 1px 0 #8a5a22;cursor:default}
+.t.sel{transform:translateY(-8px);outline:3px solid #fff7c2;background:linear-gradient(180deg,#fff0b0,#f0c24a)}
+.felt{background:radial-gradient(ellipse at 50% 30%,var(--felt),var(--felt2));border:10px solid var(--wood);border-radius:26px;box-shadow:inset 0 0 30px #0007,0 4px 12px #0004;padding:12px;color:#f6efd0}
+#tbl{position:relative;height:250px;perspective:900px}
+.dw{position:absolute;width:48px;height:48px;transition:left .9s cubic-bezier(.25,.8,.3,1),top .9s cubic-bezier(.3,1.5,.5,1),transform .9s,opacity .3s;filter:drop-shadow(0 8px 5px #0007)}
+.cube{width:48px;height:48px;position:relative;transform-style:preserve-3d;transition:transform 1s cubic-bezier(.2,.7,.2,1)}
+.f{position:absolute;inset:0;border-radius:9px;background:linear-gradient(145deg,#fff,#e6dec8);box-shadow:inset 0 0 6px #0003;display:grid;grid-template:repeat(3,1fr)/repeat(3,1fr);padding:6px;box-sizing:border-box}
+.f i{width:9px;height:9px;border-radius:50%;background:#1c1710;align-self:center;justify-self:center;box-shadow:inset 0 1px 2px #000a}
+.f1{transform:translateZ(24px)}.f6{transform:rotateY(180deg) translateZ(24px)}.f2{transform:rotateY(90deg) translateZ(24px)}.f5{transform:rotateY(-90deg) translateZ(24px)}.f3{transform:rotateX(90deg) translateZ(24px)}.f4{transform:rotateX(-90deg) translateZ(24px)}
+#cup{width:84px;height:100px;border:0;cursor:pointer;background:none;position:absolute;left:calc(50% - 42px);top:140px;z-index:5;color:var(--gold);font:700 .95em Georgia,serif;text-shadow:0 1px 2px #000;display:flex;align-items:flex-end;justify-content:center;padding:0 0 13px;box-sizing:border-box;transform-origin:50% 100%;-webkit-tap-highlight-color:transparent}
+#cup svg{position:absolute;left:0;top:0;width:84px;height:100px}#cup span{position:relative}
+#cup.tip{transform:rotate(-62deg) translate(-8px,-10px);transition:transform .25s}
+#cup.shake{animation:shake .6s}
+@keyframes shake{0%,100%{transform:rotate(0)}15%{transform:rotate(-28deg) translateY(-10px)}35%{transform:rotate(26deg) translateY(-14px)}55%{transform:rotate(-22deg) translateY(-8px)}75%{transform:rotate(18deg)}}
+.dw.rattle{animation:rat .16s linear infinite}
+@keyframes rat{0%,100%{translate:0 0}25%{translate:-6px -5px}50%{translate:6px 3px}75%{translate:-4px -4px}}
+.cs{position:absolute;left:calc(50% - 50px);top:232px;width:100px;height:14px;border-radius:50%;background:radial-gradient(ellipse,#0009,#0000 70%);z-index:1}
+#info{text-align:center;min-height:44px;margin-top:6px}
+.nb{font:700 .95em Georgia,serif;padding:8px 18px;border-radius:10px;border:2px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+#nx{margin-top:8px;background:var(--gold);color:#201c14;border-color:var(--gold)}
+.ctr{text-align:center;margin:14px}
+#cf{position:fixed;left:0;right:0;bottom:0;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));background:var(--card);border-top:2px solid var(--gold);display:flex;gap:8px;align-items:center;justify-content:center;z-index:15;box-shadow:0 -4px 12px #0004}
+#cf[hidden],.modal[hidden],#nx[hidden]{display:none}
+#cf span{flex:1;max-width:230px}
+#cf button{font:700 .95em Georgia,serif;padding:10px 16px;border-radius:10px;border:0;background:#1f8a4c;color:#fff;cursor:pointer}#cf button:disabled{opacity:.4}#cf button.no{background:var(--line);color:var(--ink)}
+.modal{position:fixed;inset:0;background:#000b;display:flex;align-items:center;justify-content:center;z-index:20}
+.box{background:var(--card);padding:24px;border-radius:16px;text-align:center;max-width:300px;width:82%}
+.box button{margin-top:14px;font:700 1em Georgia,serif;padding:10px 20px;border-radius:10px;border:0;background:var(--gold);color:#201c14;cursor:pointer}
+.box button.nb{border:2px solid var(--line);background:var(--card);color:var(--ink)}
+.seg{display:flex;gap:6px;justify-content:center;margin:8px 0}.seg button{margin:0!important;padding:8px 14px!important;background:var(--line)!important;color:var(--ink)!important}.seg button.on{background:var(--gold)!important;color:#201c14!important}
+#names input{display:block;width:100%;box-sizing:border-box;margin:6px 0;padding:9px 10px;font:1em Georgia,serif;border-radius:8px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
+@media (prefers-reduced-motion:reduce){.dw.rattle,#cup.shake{animation:none}}
+</style></head><body>
+<div id="app">
+ <div class="top" id="top"></div>
+ <div class="wood"><div id="box"></div></div>
+ <div class="felt"><div id="tbl"><div class="cs"></div><button id="cup" onclick="roll()"><svg viewBox="0 0 84 100" aria-hidden="true"><defs><linearGradient id="cg" x1="0" x2="1"><stop offset="0" stop-color="#6b4c0c"/><stop offset=".4" stop-color="#f2d36f"/><stop offset=".7" stop-color="#a8801c"/><stop offset="1" stop-color="#5e420a"/></linearGradient></defs><path d="M0 13 L11 92 C14 101 70 101 73 92 L84 13 Z" fill="#7a4a24"/><path d="M4.3 44 L79.7 44 L80.3 50 L3.7 50 Z" fill="url(#cg)"/><ellipse cx="42" cy="13" rx="40.5" ry="11" fill="#1a0e05" stroke="#e2b94a" stroke-width="3"/><ellipse cx="42" cy="15" rx="34" ry="6.5" fill="#050200"/></svg><span id="cl">Roll</span></button></div>
+  <div id="info"></div><div style="text-align:center"><button class="nb" id="nx" hidden onclick="nextP()">Next player ▶</button></div></div>
+ <div class="ctr"><button class="nb" onclick="askNew()">New game</button> <button class="nb" id="snd" onclick="mute()">Sound: on</button></div>
+</div>
+<div id="cf" hidden><span id="cft"></span><button class="no" onclick="sel=[];render()">Clear</button></div>
+<div class="modal" id="mode"><div class="box"><h2>Shut the Box</h2><div>How many players?</div><div id="cnt" class="seg"></div><div id="names"></div><div>Rounds</div><div id="rnd" class="seg"></div><div>Tiles</div><div id="tl" class="seg"></div><button onclick="begin()">Start game</button></div></div>
+<div class="modal" id="conf" hidden><div class="box"><h2>Start a new game?</h2><div>Your current game will be lost.</div><button onclick="document.getElementById('conf').hidden=true;clearSave();showSetup()">Yes, new game</button> <button class="nb" onclick="document.getElementById('conf').hidden=true">Keep playing</button></div></div>
+<div class="modal" id="res" hidden><div class="box"><h2>Resume your game?</h2><div id="rsum"></div><button onclick="resume(SAVED)">Resume</button> <button class="nb" onclick="document.getElementById('res').hidden=true;clearSave();showSetup()">New game</button></div></div>
+<div class="modal" id="over" hidden><div class="box"><h2 id="win"></h2><div id="fin"></div><button onclick="reset()">Play again</button> <button class="nb" onclick="showSetup()">Change setup</button></div></div>
+<canvas id="cv" style="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:30"></canvas>
+<script>
+const PIPS={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
+const BASE={1:[0,0],6:[0,180],2:[0,-90],5:[0,90],3:[-90,0],4:[90,0]};
+const NAMES=['Player 1','Player 2','Player 3','Player 4'],COL=['#2f6fd6','#c9503f','#8a4fc2','#d98b1f'],CUPTOP=140,KEY='stb-save';
+let NT=9,SELT=9,lock=0,typed=['','','',''],SEL=2,SELR=1,NP=2,R=1,tiles,tot,cur,round,phase,total=0,dv=[1,2],nDice=2,sel=[],busy=0,done=false,msg='';
+let ax=[0,0],ay=[0,0],tp=[null,null],ta=[0,0],els=[],AC=null,muted=false;
+const $=id=>document.getElementById(id),W=()=>$('tbl').clientWidth;
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+/* sound */
+function ac(){if(muted)return null;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state=='suspended')AC.resume()}catch(e){return null}return AC}
+function noise(t,dur,f,g,q){const a=ac();if(!a)return;const n=Math.floor(a.sampleRate*dur),b=a.createBuffer(1,n,a.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*(1-i/n);const s=a.createBufferSource();s.buffer=b;const fl=a.createBiquadFilter();fl.type='bandpass';fl.frequency.value=f;fl.Q.value=q||1;const gn=a.createGain();gn.gain.value=g;s.connect(fl);fl.connect(gn);gn.connect(a.destination);s.start(a.currentTime+t)}
+function tone(f,t,dur,g,type){const a=ac();if(!a)return;const o=a.createOscillator(),gn=a.createGain(),T=a.currentTime+t;o.type=type||'sine';o.frequency.value=f;gn.gain.setValueAtTime(g,T);gn.gain.exponentialRampToValueAtTime(.0001,T+dur);o.connect(gn);gn.connect(a.destination);o.start(T);o.stop(T+dur+.02)}
+const sRattle=()=>{for(let i=0;i<15;i++)noise(i*.045+Math.random()*.02,.05,2500+Math.random()*2500,.6,3)};
+const sThrow=()=>{for(let i=0;i<10;i++)noise(i*.07+Math.random()*.03+i*i*.004,.05,1500+Math.random()*3000,Math.max(.15,.8-i*.07),4)};
+const sBlip=()=>{tone(880,0,.08,.14,'square');tone(1320,.06,.09,.11,'square')};
+const sShut=()=>{noise(0,.12,500,1,2);tone(160,0,.18,.3,'triangle')};
+const sWin=()=>{tone(523,0,.14,.2,'triangle');tone(392,.16,1.1,.16,'triangle');tone(523,.16,1.1,.16,'triangle');tone(659,.16,1.1,.16,'triangle');tone(784,.16,1.1,.16,'triangle');noise(.16,.5,6000,.5,1)};
+function confetti(){if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;const c=$('cv'),x=c.getContext('2d'),w=innerWidth,h=innerHeight;c.width=w;c.height=h;const cols=['#e2b94a','#c9503f','#2f6fd6','#8a4fc2','#1f8a4c','#ffffff'];
+ const P=[];[.2,.5,.8].forEach(o=>{for(let i=0;i<55;i++)P.push({x:w*o,y:h*.62,vx:(Math.random()-.5)*14,vy:-Math.random()*17-5,s:6+Math.random()*6,r:Math.random()*6,vr:(Math.random()-.5)*.4,c:cols[Math.random()*6|0]})});
+ let f=0;(function step(){x.clearRect(0,0,w,h);P.forEach(p=>{p.vy+=.35;p.vx*=.99;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.s/2,-p.s/3,p.s,p.s*.6);x.restore()});if(++f<190)requestAnimationFrame(step);else x.clearRect(0,0,w,h)})()}
+const sLose=()=>{tone(260,0,.25,.2,'triangle');tone(200,.22,.4,.2,'triangle')};
+function mute(){muted=!muted;$('snd').textContent='Sound: '+(muted?'off':'on')}
+/* game logic */
+function sumOpen(){let s=0;tiles.forEach((o,i)=>{if(o)s+=i+1});return s}
+function canMove(t){const o=[];tiles.forEach((x,i)=>{if(x)o.push(i+1)});for(let m=1;m<1<<o.length;m++){let s=0;for(let k=0;k<o.length;k++)if(m>>k&1)s+=o[k];if(s==t)return true}return false}
+const want=()=>tiles.slice(6).some(Boolean)?2:1;
+function newTurn(){tiles=Array(NT).fill(true);phase='roll';sel=[];tp=[null,null];dv=[1,2];[0,1].forEach(i=>{ax[i]=BASE[dv[i]][0];ay[i]=BASE[dv[i]][1]})}
+function buildTiles(){const b=$('box');b.innerHTML='';b.style.setProperty('--n',NT==12?6:9);b.className=NT==12?'big':'';for(let n=1;n<=NT;n++){const t=document.createElement('div');t.className='t';t.textContent=n;t.onclick=()=>tap(n);b.appendChild(t)}}
+function reset(n,r,t){if(n){NP=n;R=r;NT=t||9}buildTiles();tot=[0,0,0,0];cur=0;round=1;done=false;msg='';newTurn();['over','mode','conf','res'].forEach(k=>$(k).hidden=true);render()}
+function endTurn(box){const s=sumOpen();tot[cur]+=s;phase='next';msg=box?'SHUT THE BOX! 0 points.':'No moves possible. You score '+s+' point'+(s==1?'':'s')+'.';box?(sWin(),confetti()):sLose();if(NP==1&&round>=R)setTimeout(()=>{if(phase=='next'&&!done)finish()},box?3500:2500)}
+function nextP(){if(phase!='next')return;cur++;if(cur>=NP){cur=0;round++}if(round>R){finish();return}newTurn();render()}
+function finish(){done=true;const r=[...Array(NP).keys()].map(p=>[p,tot[p]]).sort((a,b)=>a[1]-b[1]);const w=r.filter(x=>x[1]==r[0][1]);
+ $('win').textContent=NP==1?'Game over':w.length>1?'It’s a tie: '+w.map(x=>NAMES[x[0]]).join(' & '):NAMES[r[0][0]]+' wins!';
+ $('fin').innerHTML=r.map(x=>esc(NAMES[x[0]])+' · '+x[1]+' pts').join('<br>')+'<div style="opacity:.7;margin-top:6px">Lowest score wins</div>';
+ clearSave();render();$('over').hidden=false}
+function tap(n){if(phase!='pick'||busy||lock||!tiles[n-1])return;const i=sel.indexOf(n);i>=0?sel.splice(i,1):sel.push(n);sBlip();render();if(sel.reduce((a,b)=>a+b,0)==total){lock=1;setTimeout(()=>{lock=0;shut()},450)}}
+function shut(){if(phase!='pick'||sel.reduce((a,b)=>a+b,0)!=total)return;sel.forEach(n=>tiles[n-1]=false);sel=[];sShut();if(!sumOpen())endTurn(true);else phase='roll';render()}
+/* dice */
+function build(){
+ for(let i=0;i<2;i++){const w=document.createElement('div');w.className='dw';const c=document.createElement('div');c.className='cube';
+  for(let v=1;v<=6;v++){const f=document.createElement('div');f.className='f f'+v;for(let k=0;k<9;k++){const p=document.createElement('i');p.style.visibility=PIPS[v].includes(k)?'visible':'hidden';f.appendChild(p)}c.appendChild(f)}
+  w.appendChild(c);$('tbl').appendChild(w);els.push(w)}}
+function rand(i){const w=W();for(let t=0;t<40;t++){const p=[6+Math.random()*(w-60),8+Math.random()*78];if(!tp[1-i]||Math.hypot(tp[1-i][0]-p[0],tp[1-i][1]-p[1])>54)return p}return [6+Math.random()*(w-60),30]}
+function place(i,fly){const w=els[i];let x,y,a=0;if(tp[i]){[x,y]=tp[i];a=ta[i]}else{x=W()/2-42+16+i*14;y=CUPTOP-14+i*3}
+ w.style.left=x+'px';w.style.top=y+'px';w.style.transform='rotate('+a+'deg)';w.style.opacity=(!tp[i]&&!fly)?0:1;
+ w.firstChild.style.transform='rotateX(-10deg) rotateY(-12deg) rotateX('+ax[i]+'deg) rotateY('+ay[i]+'deg)'}
+function roll(){
+ if(busy||phase!='roll')return;busy=1;sel=[];ac();nDice=want();const cup=$('cup'),idx=[0,1].slice(0,nDice);
+ [0,1].forEach(i=>{tp[i]=null;els[i].style.zIndex=3;place(i,i<nDice)});render();
+ setTimeout(()=>{sRattle();idx.forEach(i=>els[i].style.opacity=0);cup.classList.remove('shake');void cup.offsetWidth;cup.classList.add('shake');idx.forEach(i=>els[i].classList.add('rattle'));
+  setTimeout(()=>{cup.classList.remove('shake');cup.classList.add('tip');sThrow();
+   idx.forEach(i=>{const w=els[i];w.classList.remove('rattle');w.style.zIndex=6;const v=1+Math.floor(Math.random()*6);dv[i]=v;
+    ax[i]=Math.ceil(ax[i]/360)*360+360*(2+Math.floor(Math.random()*2))+BASE[v][0];ay[i]=Math.ceil(ay[i]/360)*360+360*(2+Math.floor(Math.random()*2))+BASE[v][1];
+    tp[i]=rand(i);ta[i]=Math.round(Math.random()*80-40);place(i)});
+   setTimeout(()=>{cup.classList.remove('tip');els.forEach(w=>w.style.zIndex=2);busy=0;total=idx.reduce((a,i)=>a+dv[i],0);if(canMove(total))phase='pick';else endTurn(false);render()},1150)},700)},550);
+}
+/* ui */
+function render(){
+ $('top').innerHTML=[...Array(NP).keys()].map(p=>'<div class="pl'+(p==cur?' on':'')+'" style="border-left:6px solid '+COL[p]+'"><span>'+esc(NAMES[p])+'</span><b>'+tot[p]+' pts</b></div>').join('');
+ [...$('box').children].forEach((t,i)=>{t.classList.toggle('shut',!tiles[i]);t.classList.toggle('sel',sel.includes(i+1))});
+ if(!busy)els.forEach((_,i)=>place(i));
+ $('cl').textContent='Roll';$('cup').disabled=busy||phase!='roll';
+ const who=NP>1?NAMES[cur]+': ':'',n=phase=='roll'?want():nDice;
+ $('info').textContent=busy?'Rolling…':phase=='roll'?who+'Round '+round+'/'+R+' · shake the cup ('+n+(n==1?' die':' dice')+')':phase=='pick'?who+'You rolled '+total+'. Tap tiles that add up to '+total+'.':msg;
+ $('nx').hidden=phase!='next'||(NP==1&&round>=R);$('nx').textContent=NP==1?'Next round ▶':'Next player ▶';
+ const ok=phase=='pick'&&sel.length&&!busy;$('cf').hidden=!ok;
+ if(ok){const s=sel.reduce((a,b)=>a+b,0);$('cft').textContent=[...sel].sort((a,b)=>a-b).join(' + ')+' = '+s+(s==total?'':' (need '+total+')')}
+ if(!busy)save();
+}
+/* setup, save, resume */
+function drawSetup(){$('cnt').innerHTML=[1,2,3,4].map(n=>'<button class="'+(n==SEL?'on':'')+'" onclick="SEL='+n+';drawSetup()">'+n+'</button>').join('');
+ $('rnd').innerHTML=[1,3,5].map(n=>'<button class="'+(n==SELR?'on':'')+'" onclick="SELR='+n+';drawSetup()">'+n+'</button>').join('');
+ $('tl').innerHTML=[9,12].map(n=>'<button class="'+(n==SELT?'on':'')+'" onclick="SELT='+n+';drawSetup()">'+n+'</button>').join('');
+ $('names').innerHTML=Array.from({length:SEL},(_,p)=>'<input maxlength="12" placeholder="Player '+(p+1)+'" value="'+esc(typed[p])+'" oninput="typed['+p+']=this.value" aria-label="Name for player '+(p+1)+'">').join('')}
+function showSetup(){$('over').hidden=true;drawSetup();$('mode').hidden=false}
+function begin(){for(let p=0;p<4;p++)NAMES[p]=typed[p].trim()||'Player '+(p+1);reset(SEL,SELR,SELT)}
+function inProgress(){return round>1||cur>0||phase!='roll'||tot.some(x=>x)||sumOpen()<NT*(NT+1)/2}
+function save(){try{if(done||!inProgress())localStorage.removeItem(KEY);else localStorage.setItem(KEY,JSON.stringify({NP,NT,NAMES,R,round,cur,tot,tiles,phase,dv,nDice,total,msg}))}catch(e){}}
+function clearSave(){try{localStorage.removeItem(KEY)}catch(e){}}
+function load(){try{return JSON.parse(localStorage.getItem(KEY))}catch(e){return null}}
+function askNew(){if(inProgress()&&!done)$('conf').hidden=false;else showSetup()}
+function resume(d){if(!d)return;NP=d.NP;NT=d.NT||9;buildTiles();d.NAMES.forEach((n,i)=>NAMES[i]=n);R=d.R;round=d.round;cur=d.cur;tot=d.tot;tiles=d.tiles;phase=d.phase;dv=d.dv;nDice=d.nDice;total=d.total;msg=d.msg;sel=[];busy=0;done=false;
+ tp=[null,null];dv.forEach((v,i)=>{ax[i]=BASE[v][0];ay[i]=BASE[v][1]});if(phase!='roll')for(let i=0;i<nDice;i++){tp[i]=rand(i);ta[i]=Math.round(Math.random()*80-40)}
+ ['res','mode','over','conf'].forEach(k=>$(k).hidden=true);render();if(phase=='next'&&NP==1&&round>=R)setTimeout(()=>{if(phase=='next'&&!done)finish()},1500)}
+const SAVED=load();
+build();reset(2,1);drawSetup();$('mode').hidden=false;
+if(SAVED&&SAVED.tiles&&SAVED.tot){$('mode').hidden=true;$('rsum').textContent=SAVED.NAMES.slice(0,SAVED.NP).join(', ')+' · round '+SAVED.round+' of '+SAVED.R;$('res').hidden=false}
+addEventListener('resize',()=>els.forEach((_,i)=>place(i)));
+</script></body></html>
