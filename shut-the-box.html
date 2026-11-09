@@ -8,6 +8,7 @@
 :root[data-theme="dark"]{--bg:#15130f;--ink:#f0e9d6;--card:#211d15;--line:#3d3626;--hi:#4b3f16;color-scheme:dark}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 Georgia,"Times New Roman",serif}
 #app{max-width:460px;margin:0 auto;padding:10px 10px 100px}
+.gt{margin:0 0 8px;padding:8px 14px;text-align:center;font:700 1.35em Georgia,serif;color:var(--gold);background:linear-gradient(180deg,#7a4a24,#5a3418);border:3px solid #3a200c;border-radius:12px;text-shadow:0 2px 3px #000a;letter-spacing:.03em}
 .top{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
 .pl{flex:1 1 40%;min-width:0;padding:8px 10px;border-radius:10px;border:2px solid var(--line);background:var(--card);display:flex;justify-content:space-between;align-items:baseline}
 .pl.on{border-color:var(--gold);background:var(--hi)}
@@ -49,6 +50,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 Georgia,"Times
 @media (prefers-reduced-motion:reduce){.dw.rattle,#cup.shake{animation:none}}
 </style></head><body>
 <div id="app">
+ <div class="gt">Shut the Box</div>
  <div class="top" id="top"></div>
  <div class="wood"><div id="box"></div></div>
  <div class="felt"><div id="tbl"><div class="cs"></div><button id="cup" onclick="roll()"><svg viewBox="0 0 84 100" aria-hidden="true"><defs><linearGradient id="cg" x1="0" x2="1"><stop offset="0" stop-color="#6b4c0c"/><stop offset=".4" stop-color="#f2d36f"/><stop offset=".7" stop-color="#a8801c"/><stop offset="1" stop-color="#5e420a"/></linearGradient></defs><path d="M0 13 L11 92 C14 101 70 101 73 92 L84 13 Z" fill="#7a4a24"/><path d="M4.3 44 L79.7 44 L80.3 50 L3.7 50 Z" fill="url(#cg)"/><ellipse cx="42" cy="13" rx="40.5" ry="11" fill="#1a0e05" stroke="#e2b94a" stroke-width="3"/><ellipse cx="42" cy="15" rx="34" ry="6.5" fill="#050200"/></svg><span id="cl">Roll</span></button></div>

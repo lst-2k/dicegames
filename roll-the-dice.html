@@ -22,6 +22,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 Georgia,"Times
 #cf[hidden]{display:none}#cf span{flex:1;max-width:230px;font-size:.95em}
 #cf button{font:700 .95em Georgia,serif;padding:10px 16px;border-radius:10px;border:0;background:#1f8a4c;color:#fff;cursor:pointer}#cf button.no{background:var(--line);color:var(--ink)}
 td.sel{outline:3px solid var(--ink);outline-offset:-3px}
+.gt{margin:0 0 8px;padding:8px 14px;text-align:center;font:700 1.35em Georgia,serif;color:var(--gold);background:linear-gradient(180deg,#7a4a24,#5a3418);border:3px solid #3a200c;border-radius:12px;text-shadow:0 2px 3px #000a;letter-spacing:.03em}
 .top{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
 .pl{flex:1 1 40%;min-width:0;padding:8px 10px;border-radius:10px;border:2px solid var(--line);background:var(--card);display:flex;justify-content:space-between;align-items:baseline}
 .pl.on{border-color:var(--gold);background:var(--hi)}
@@ -66,6 +67,7 @@ tr.tot td{font-weight:700;font-size:1.1em;border-top:2px solid var(--ink)}
 @media (prefers-reduced-motion:reduce){.tumble,.land,#cup.shake{animation:none}}
 </style></head><body>
 <div id="app">
+ <div class="gt">Roll the Dice</div>
  <div class="top" id="top"></div>
  <div class="felt">
   <div id="tbl"><div class="kz" id="kz">Tap a die to keep it</div><div class="cs"></div><button id="cup" onclick="roll()"><svg viewBox="0 0 84 100" aria-hidden="true"><defs><linearGradient id="cg" x1="0" x2="1"><stop offset="0" stop-color="#6b4c0c"/><stop offset=".4" stop-color="#f2d36f"/><stop offset=".7" stop-color="#a8801c"/><stop offset="1" stop-color="#5e420a"/></linearGradient></defs><path d="M0 13 L11 92 C14 101 70 101 73 92 L84 13 Z" fill="#7a4a24"/><path d="M4.3 44 L79.7 44 L80.3 50 L3.7 50 Z" fill="url(#cg)"/><ellipse cx="42" cy="13" rx="40.5" ry="11" fill="#1a0e05" stroke="#e2b94a" stroke-width="3"/><ellipse cx="42" cy="15" rx="34" ry="6.5" fill="#050200"/></svg><span id="cl">Roll</span></button></div>
@@ -171,7 +173,7 @@ function finish(){
  open=false;render();clearSave();document.getElementById('over').hidden=false;
 }
 function ui(){
- const cup=document.getElementById('cup');cup.disabled=busy||rolls>=3||order.length==5;document.getElementById('cl').textContent=rolls==0?'Roll':'Roll';
+ const cup=document.getElementById('cup');cup.disabled=busy||rolls>=3||order.length==5;document.getElementById('cl').textContent=rolls==0?'Roll':'Roll again';
  document.getElementById('info').textContent=busy?'Rolling…':order.length==5?'All dice kept. The scorecard will open shortly.':rolls==0?(NP==1?'Shake the cup to start your turn.':NAMES[cur]+', shake the cup to start your turn.'):rolls<3?(3-rolls)+' roll'+(3-rolls>1?'s':'')+' left. Tap dice to keep them, then roll again, or slide up the scorecard to score.':'No rolls left. Pick a score on the scorecard.';
 }
 function pot(d,i){
