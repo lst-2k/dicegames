@@ -19,20 +19,20 @@ body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 Georgia,"Times
 .t.shut{transform:rotateX(30deg);filter:brightness(.5);box-shadow:0 1px 0 #8a5a22;cursor:default}
 .t.sel{transform:translateY(-8px);outline:3px solid #fff7c2;background:linear-gradient(180deg,#fff0b0,#f0c24a)}
 .felt{background:radial-gradient(ellipse at 50% 30%,var(--felt),var(--felt2));border:10px solid var(--wood);border-radius:26px;box-shadow:inset 0 0 30px #0007,0 4px 12px #0004;padding:12px;color:#f6efd0}
-#tbl{position:relative;height:250px;perspective:900px}
+#tbl{position:relative;height:325px;perspective:900px}
 .dw{position:absolute;width:48px;height:48px;transition:left .9s cubic-bezier(.25,.8,.3,1),top .9s cubic-bezier(.3,1.5,.5,1),transform .9s,opacity .3s;filter:drop-shadow(0 8px 5px #0007)}
 .cube{width:48px;height:48px;position:relative;transform-style:preserve-3d;transition:transform 1s cubic-bezier(.2,.7,.2,1)}
 .f{position:absolute;inset:0;border-radius:9px;background:linear-gradient(145deg,#fff,#e6dec8);box-shadow:inset 0 0 6px #0003;display:grid;grid-template:repeat(3,1fr)/repeat(3,1fr);padding:6px;box-sizing:border-box}
 .f i{width:9px;height:9px;border-radius:50%;background:#1c1710;align-self:center;justify-self:center;box-shadow:inset 0 1px 2px #000a}
 .f1{transform:translateZ(24px)}.f6{transform:rotateY(180deg) translateZ(24px)}.f2{transform:rotateY(90deg) translateZ(24px)}.f5{transform:rotateY(-90deg) translateZ(24px)}.f3{transform:rotateX(90deg) translateZ(24px)}.f4{transform:rotateX(-90deg) translateZ(24px)}
-#cup{width:84px;height:100px;border:0;cursor:pointer;background:none;position:absolute;left:calc(50% - 42px);top:140px;z-index:5;color:var(--gold);font:700 .95em Georgia,serif;text-shadow:0 1px 2px #000;display:flex;align-items:flex-end;justify-content:center;padding:0 0 13px;box-sizing:border-box;transform-origin:50% 100%;-webkit-tap-highlight-color:transparent}
+#cup{width:84px;height:100px;border:0;cursor:pointer;background:none;position:absolute;left:calc(50% - 42px);top:215px;z-index:5;color:var(--gold);font:700 .95em Georgia,serif;text-shadow:0 1px 2px #000;display:flex;align-items:flex-end;justify-content:center;padding:0 0 13px;box-sizing:border-box;transform-origin:50% 100%;-webkit-tap-highlight-color:transparent}
 #cup svg{position:absolute;left:0;top:0;width:84px;height:100px}#cup span{position:relative}
 #cup.tip{transform:rotate(-62deg) translate(-8px,-10px);transition:transform .25s}
 #cup.shake{animation:shake .6s}
 @keyframes shake{0%,100%{transform:rotate(0)}15%{transform:rotate(-28deg) translateY(-10px)}35%{transform:rotate(26deg) translateY(-14px)}55%{transform:rotate(-22deg) translateY(-8px)}75%{transform:rotate(18deg)}}
 .dw.rattle{animation:rat .16s linear infinite}
 @keyframes rat{0%,100%{translate:0 0}25%{translate:-6px -5px}50%{translate:6px 3px}75%{translate:-4px -4px}}
-.cs{position:absolute;left:calc(50% - 50px);top:232px;width:100px;height:14px;border-radius:50%;background:radial-gradient(ellipse,#0009,#0000 70%);z-index:1}
+.cs{position:absolute;left:calc(50% - 50px);top:307px;width:100px;height:14px;border-radius:50%;background:radial-gradient(ellipse,#0009,#0000 70%);z-index:1}
 #info{text-align:center;min-height:44px;margin-top:6px}
 .nb{font:700 .95em Georgia,serif;padding:8px 18px;border-radius:10px;border:2px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
 #nx{margin-top:8px;background:var(--gold);color:#201c14;border-color:var(--gold)}
@@ -110,7 +110,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 Georgia,"Times
 <script>
 const PIPS={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
 const BASE={1:[0,0],6:[0,180],2:[0,-90],5:[0,90],3:[-90,0],4:[90,0]};
-const NAMES=['Player 1','Player 2','Player 3','Player 4'],COL=['#2f6fd6','#c9503f','#8a4fc2','#d98b1f'],CUPTOP=140,KEY='stb-save';
+const NAMES=['Player 1','Player 2','Player 3','Player 4'],COL=['#2f6fd6','#c9503f','#8a4fc2','#d98b1f'],CUPTOP=215,KEY='stb-save';
 let NT=9,SELT=9,lock=0,typed=['','','',''],SEL=2,SELR=1,NP=2,R=1,tiles,tot,cur,round,phase,total=0,dv=[1,2],nDice=2,sel=[],busy=0,done=false,msg='';
 let ax=[0,0],ay=[0,0],tp=[null,null],ta=[0,0],els=[],AC=null,muted=false;
 const $=id=>document.getElementById(id),W=()=>$('tbl').clientWidth;
@@ -149,7 +149,7 @@ function build(){
  for(let i=0;i<2;i++){const w=document.createElement('div');w.className='dw';const c=document.createElement('div');c.className='cube';
   for(let v=1;v<=6;v++){const f=document.createElement('div');f.className='f f'+v;for(let k=0;k<9;k++){const p=document.createElement('i');p.style.visibility=PIPS[v].includes(k)?'visible':'hidden';f.appendChild(p)}c.appendChild(f)}
   w.appendChild(c);$('tbl').appendChild(w);els.push(w)}}
-function rand(i){const w=W();for(let t=0;t<40;t++){const p=[6+Math.random()*(w-60),8+Math.random()*78];if(!tp[1-i]||Math.hypot(tp[1-i][0]-p[0],tp[1-i][1]-p[1])>54)return p}return [6+Math.random()*(w-60),30]}
+function rand(i){const w=W();for(let t=0;t<40;t++){const p=[6+Math.random()*(w-60),8+Math.random()*153];if(!tp[1-i]||Math.hypot(tp[1-i][0]-p[0],tp[1-i][1]-p[1])>54)return p}return [6+Math.random()*(w-60),30]}
 function place(i,fly){const w=els[i];let x,y,a=0;if(tp[i]){[x,y]=tp[i];a=ta[i]}else{x=W()/2-42+16+i*14;y=CUPTOP-14+i*3}
  w.style.left=x+'px';w.style.top=y+'px';w.style.transform='rotate('+a+'deg)';w.style.opacity=(!tp[i]&&!fly)?0:1;
  w.firstChild.style.transform='rotateX(-10deg) rotateY(-12deg) rotateX('+ax[i]+'deg) rotateY('+ay[i]+'deg)'}
