@@ -68,6 +68,43 @@ tr.tot td{font-weight:700;font-size:1.1em;border-top:2px solid var(--ink)}
 .box input{display:block;width:100%;box-sizing:border-box;margin:6px 0;padding:9px 10px;font:1em Georgia,serif;border-radius:8px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
 #oshare{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}#oshare button,#opl{margin-top:8px}#opl{line-height:1.7}
 </style></head><body>
+<!-- Floating Menu Button & Popup (Top Left) -->
+<div id="portal-menu-container" style="position: fixed; top: 20px; left: 20px; z-index: 9999; font-family: sans-serif;">
+    
+    <!-- 3-Line Square Menu Button -->
+    <button onclick="togglePortalMenu()" 
+            title="Menu"
+            style="width: 42px; height: 42px; background: #061811; color: #d4af37; border: 2px solid #d4af37; border-radius: 8px; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+        <span style="width: 20px; height: 2px; background-color: #d4af37; border-radius: 2px; transition: 0.3s;"></span>
+        <span style="width: 20px; height: 2px; background-color: #d4af37; border-radius: 2px; transition: 0.3s;"></span>
+        <span style="width: 20px; height: 2px; background-color: #d4af37; border-radius: 2px; transition: 0.3s;"></span>
+    </button>
+
+    <!-- Hidden Dropdown Menu (Opens Downward) -->
+    <div id="portal-menu-dropdown" style="display: none; margin-top: 10px; background: #061811; border: 2px solid #d4af37; border-radius: 10px; padding: 8px; box-shadow: 0 8px 20px rgba(0,0,0,0.6); min-width: 150px;">
+        <a href="https://lst-2k.github.io/mind-games-portal/" 
+           style="display: flex; align-items: center; justify-content: center; gap: 8px; color: #d4af37; text-decoration: none; font-size: 13px; font-weight: bold; padding: 8px 12px; border-radius: 6px; background: rgba(212, 175, 55, 0.1); transition: background 0.2s;"
+           onmouseover="this.style.background='rgba(212, 175, 55, 0.25)'" 
+           onmouseout="this.style.background='rgba(212, 175, 55, 0.1)'">
+           ← Back to Games
+        </a>
+    </div>
+</div>
+
+<script>
+    function togglePortalMenu() {
+        const menu = document.getElementById('portal-menu-dropdown');
+        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // Close menu when clicking outside of it
+    document.addEventListener('click', function(event) {
+        const container = document.getElementById('portal-menu-container');
+        if (container && !container.contains(event.target)) {
+            document.getElementById('portal-menu-dropdown').style.display = 'none';
+        }
+    });
+</script>
 <div id="app">
  <div class="gt">Roll the Dice</div>
  <div class="top" id="top"></div>
@@ -180,7 +217,7 @@ function finish(){
  open=false;render();clearSave();document.getElementById('over').hidden=false;
 }
 function ui(){
- const cup=document.getElementById('cup');cup.disabled=busy||rolls>=3||order.length==5||!mine();document.getElementById('cl').textContent=rolls==0?'Roll':'Roll again';
+ const cup=document.getElementById('cup');cup.disabled=busy||rolls>=3||order.length==5||!mine();document.getElementById('cl').textContent=rolls==0?'Roll':'Roll';
  document.getElementById('info').textContent=busy?'Rolling…':order.length==5?'All dice kept. The scorecard will open shortly.':rolls==0?(NP==1?'Shake the cup to start your turn.':NAMES[cur]+', shake the cup to start your turn.'):rolls<3?(3-rolls)+' roll'+(3-rolls>1?'s':'')+' left. Tap dice to keep them, then roll again, or slide up the scorecard to score.':'No rolls left. Pick a score on the scorecard.';
 }
 function pot(d,i){
