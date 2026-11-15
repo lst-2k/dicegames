@@ -99,7 +99,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 Georgia,"Times
 <div id="cf" hidden><span id="cft"></span><button class="no" onclick="clr()">Clear</button></div>
 <div class="modal" id="mode"><div class="box"><h2>Shut the Box</h2><div>How many players?</div><div id="cnt" class="seg"></div><div id="names"></div><div>Rounds</div><div id="rnd" class="seg"></div><div>Tiles</div><div id="tl" class="seg"></div><button onclick="begin()">Start game</button> <button class="nb" onclick="showOnline()">🌐 Play online</button></div></div>
 <div class="modal" id="conf" hidden><div class="box"><h2>Start a new game?</h2><div>Your current game will be lost.</div><button onclick="document.getElementById('conf').hidden=true;clearSave();showSetup()">Yes, new game</button> <button class="nb" onclick="document.getElementById('conf').hidden=true">Keep playing</button></div></div>
-<div class="modal" id="res" hidden><div class="box"><h2>Resume your game?</h2><div id="rsum"></div><button onclick="resume(SAVED)">Resume</button> <button class="nb" onclick="document.getElementById('res').hidden=true;clearSave();showSetup()">New game</button></div></div>
+<div class="modal" id="res" hidden><div class="box"><h2>Resume your game?</h2><div id="rsum"></div><button onclick="resumeAny()">Resume</button> <button class="nb" onclick="document.getElementById('res').hidden=true;clearSave();showSetup()">New game</button></div></div>
 <div class="modal" id="over" hidden><div class="box"><h2 id="win"></h2><div id="fin"></div><button onclick="ON.on?showSetup():reset()">Play again</button> <button class="nb" onclick="showSetup()">Change setup</button></div></div>
 <canvas id="cv" style="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:30"></canvas>
 <div class="modal" id="onl" hidden><div class="box"><h2>Play online</h2>
@@ -185,14 +185,14 @@ function drawSetup(){$('cnt').innerHTML=[1,2,3,4].map(n=>'<button class="'+(n==S
 function showSetup(){oleave();$('over').hidden=true;drawSetup();$('mode').hidden=false}
 function begin(){for(let p=0;p<4;p++)NAMES[p]=typed[p].trim()||'Player '+(p+1);reset(SEL,SELR,SELT)}
 function inProgress(){return round>1||cur>0||phase!='roll'||tot.some(x=>x)||sumOpen()<NT*(NT+1)/2}
-function save(){if(ON.on)return;try{if(done||!inProgress())localStorage.removeItem(KEY);else localStorage.setItem(KEY,JSON.stringify({NP,NT,NAMES,R,round,cur,tot,tiles,phase,dv,nDice,total,msg}))}catch(e){}}
-function clearSave(){try{localStorage.removeItem(KEY)}catch(e){}}
+function save(){if(ON.on){osave();return}try{if(done||!inProgress())localStorage.removeItem(KEY);else localStorage.setItem(KEY,JSON.stringify({NP,NT,NAMES,R,round,cur,tot,tiles,phase,dv,nDice,total,msg}))}catch(e){}}
+function clearSave(){try{localStorage.removeItem(KEY);localStorage.removeItem('ol-'+HOOK.key)}catch(e){}}
 function load(){try{return JSON.parse(localStorage.getItem(KEY))}catch(e){return null}}
 function askNew(){if(inProgress()&&!done)$('conf').hidden=false;else showSetup()}
 function resume(d){if(!d)return;NP=d.NP;NT=d.NT||9;buildTiles();d.NAMES.forEach((n,i)=>NAMES[i]=n);R=d.R;round=d.round;cur=d.cur;tot=d.tot;tiles=d.tiles;phase=d.phase;dv=d.dv;nDice=d.nDice;total=d.total;msg=d.msg;sel=[];busy=0;done=false;
  tp=[null,null];dv.forEach((v,i)=>{ax[i]=BASE[v][0];ay[i]=BASE[v][1]});if(phase!='roll')for(let i=0;i<nDice;i++){tp[i]=rand(i);ta[i]=Math.round(Math.random()*80-40)}
  ['res','mode','over','conf'].forEach(k=>$(k).hidden=true);render();if(phase=='next'&&NP==1&&round>=R)setTimeout(()=>{if(phase=='next'&&!done)finish()},1500)}
-const HOOK={key:'stb',file:'shut-the-box.html',title:'Shut the Box',opts:()=>({R:SELR,NT:SELT}),start:p=>reset(p.ids.length,p.R,p.NT),
+const HOOK={full:()=>({NP,NT,NAMES,R,round,cur,tot,tiles,phase,dv,nDice,total,msg}),set:d=>resume(d),key:'stb',file:'shut-the-box.html',title:'Shut the Box',opts:()=>({R:SELR,NT:SELT}),start:p=>reset(p.ids.length,p.R,p.NT),
  ev(t,p){if(t=='roll')roll(p);else if(t=='sel'){sel=p;render()}else if(t=='state')applyState(p);else if(t=='fin'){tot=p.tot;finish()}}};
 const snap=()=>({tiles,tot,cur,round,phase,total,msg,sel});
 function applyState(s){const nt=s.cur!=cur||s.round!=round,was=phase;cur=s.cur;round=s.round;tot=s.tot;tiles=s.tiles;phase=s.phase;total=s.total;msg=s.msg;sel=s.sel||[];if(nt)tp=[null,null];render();if(phase=='next'&&was!='next'&&/SHUT/.test(msg)){sWin();confetti()}}
@@ -201,21 +201,21 @@ function clr(){if(!mine())return;sel=[];osend('sel',sel);render()}
 /* ---- online play (Supabase Realtime Broadcast + Presence) ---- */
 const SB_URL='https://ajsausfqqmjglkapornk.supabase.co',SB_KEY='sb_publishable_2Uygqu-sr--sl0OVsZpwbQ_IAXYfYzw',SITE='https://lst-2k.github.io/dicegames/';
 const $o=id=>document.getElementById(id);
-const ON={on:false,me:-1,host:false,code:'',ch:null,sb:null,peers:[],ids:[],id:Math.random().toString(36).slice(2,9)};
+const ON={seq:0,on:false,me:-1,host:false,code:'',ch:null,sb:null,peers:[],ids:[],id:Math.random().toString(36).slice(2,9)};
 const mine=()=>!ON.on||ON.me==cur;
-function osend(t,p){if(ON.ch&&(ON.on||t=='start'))ON.ch.send({type:'broadcast',event:'g',payload:{t,p,from:ON.id}})}
+function osend(t,p){if(!(ON.ch&&(ON.on||t=='start')))return;const n=(t=='hello'||t=='full'||t=='start')?ON.seq:++ON.seq;ON.ch.send({type:'broadcast',event:'g',payload:{t,p,from:ON.id,n}})}
 function oerr(m){$o('oerr').textContent=m||''}
 function showOnline(){$o('mode').hidden=true;$o('res').hidden=true;$o('o1').hidden=false;$o('o2').hidden=true;oerr();$o('onl').hidden=false}
 function rcode(){const a='ABCDEFGHJKLMNPQRSTUVWXYZ';let s='';for(let i=0;i<4;i++)s+=a[Math.floor(Math.random()*a.length)];return s}
 function ocreate(){ON.code=rcode();oconnect(($o('onm').value||'').trim()||'Host',true)}
 function ojoin(){const c=($o('ocd').value||'').trim().toUpperCase();if(c.length!=4){oerr('Enter the 4-letter room code.');return}ON.code=c;oconnect(($o('onm').value||'').trim()||'Player',false)}
-function oconnect(name,host){
+function oconnect(name,host,re){
  if(typeof supabase==='undefined'){oerr('Online play could not load. Check your connection.');return}
- oleave();ON.host=host;ON.sb=ON.sb||supabase.createClient(SB_URL,SB_KEY);
+ if(!re)oleave();ON.host=host;ON.sb=ON.sb||supabase.createClient(SB_URL,SB_KEY);
  const ch=ON.ch=ON.sb.channel('game-'+HOOK.key+'-'+ON.code,{config:{broadcast:{self:false},presence:{key:ON.id}}});
  ch.on('broadcast',{event:'g'},({payload})=>oget(payload))
   .on('presence',{event:'sync'},()=>{const s=ch.presenceState();ON.peers=Object.entries(s).map(([k,v])=>({id:k,name:v[0].name,host:v[0].host,t:v[0].t})).sort((a,b)=>(b.host?1:0)-(a.host?1:0)||a.t-b.t);olobby()})
-  .subscribe(async st=>{if(st=='SUBSCRIBED'){await ch.track({name,host,t:Date.now()});olobby()}else if(st=='CHANNEL_ERROR'||st=='TIMED_OUT')oerr('Could not connect. Try again.')});
+  .subscribe(async st=>{if(st=='SUBSCRIBED'){await ch.track({name,host,t:Date.now()});olobby();if(ON.on)osend('hello',{})}else if(st=='CHANNEL_ERROR'||st=='TIMED_OUT')oerr('Could not connect. Try again.')});
  $o('o1').hidden=true;$o('o2').hidden=false;$o('ocode').textContent=ON.code;
  $o('oshare').innerHTML=(navigator.share?'<button class="nb" onclick="oshare()">Share…</button>':'')+'<button class="nb" onclick="oshare(\'wa\')">WhatsApp</button><button class="nb" onclick="oshare(\'sms\')">SMS</button><button class="nb" onclick="oshare(\'copy\')">Copy link</button>';
  $o('ocp').textContent=host?'Send the invite to your friends':'';
@@ -232,12 +232,26 @@ function oshare(k){const t='Join my game of '+HOOK.title+'! Room code '+ON.code+
  else if(k=='copy'){try{navigator.clipboard.writeText(olink());$o('ocp').textContent='Link copied'}catch(e){$o('ocp').textContent=olink()}}
  else if(navigator.share)navigator.share({title:HOOK.title,text:'Join my game! Room code '+ON.code,url:olink()}).catch(()=>{})}
 function ostartGame(){const pr=ON.peers.slice(0,4);if(pr.length<2)return;const p=Object.assign({ids:pr.map(x=>x.id),names:pr.map(x=>x.name)},HOOK.opts());osend('start',p);ostart(p)}
-function ostart(p){ON.on=true;ON.ids=p.ids;ON.me=p.ids.indexOf(ON.id);p.names.forEach((n,i)=>NAMES[i]=n);$o('onl').hidden=true;HOOK.start(p)}
-function oget(m){if(!m||m.from==ON.id)return;if(m.t=='start'&&!ON.on)ostart(m.p);else if(ON.on)HOOK.ev(m.t,m.p)}
-function oleave(){if(ON.ch){try{ON.sb.removeChannel(ON.ch)}catch(e){}}ON.ch=null;ON.on=false;ON.me=-1;ON.peers=[]}
+function ostart(p){ON.seq=0;ON.on=true;ON.ids=p.ids;ON.me=p.ids.indexOf(ON.id);p.names.forEach((n,i)=>NAMES[i]=n);$o('onl').hidden=true;HOOK.start(p)}
+function oget(m){if(!m||m.from==ON.id)return;
+ if(m.t=='start'&&!ON.on){ostart(m.p);return}
+ if(!ON.on)return;
+ if(m.t=='hello'){if(ON.seq>m.n)osend('full',{s:HOOK.full()});else if(ON.seq<m.n)osend('hello',{});return}
+ if(m.t=='full'){if(m.n>ON.seq){ON.seq=m.n;HOOK.set(m.p.s)}return}
+ if(m.n>ON.seq+1){osend('hello',{});return}
+ if(m.n>ON.seq)ON.seq=m.n;HOOK.ev(m.t,m.p)}
+function osave(){try{if(done)localStorage.removeItem('ol-'+HOOK.key);else localStorage.setItem('ol-'+HOOK.key,JSON.stringify({code:ON.code,id:ON.id,me:ON.me,ids:ON.ids,host:ON.host,seq:ON.seq,state:HOOK.full()}))}catch(e){}}
+const OSAVED=(()=>{try{return JSON.parse(localStorage.getItem('ol-'+HOOK.key))}catch(e){return null}})();
+function orejoin(){const d=OSAVED;if(!d)return;if(typeof supabase==='undefined'){alert('Online play could not load. Check your connection.');return}
+ ON.id=d.id;ON.code=d.code;ON.me=d.me;ON.ids=d.ids;ON.seq=d.seq||0;ON.on=true;$o('res').hidden=true;$o('mode').hidden=true;
+ HOOK.set(d.state);oconnect(NAMES[d.me]||'Player',d.host,true)}
+function resumeAny(){OSAVED?orejoin():resume(SAVED)}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&ON.on)osend('hello',{})});
+function oleave(){try{localStorage.removeItem('ol-'+HOOK.key)}catch(e){}if(ON.ch){try{ON.sb.removeChannel(ON.ch)}catch(e){}}ON.ch=null;ON.on=false;ON.me=-1;ON.peers=[]}
 const SAVED=load();
 build();reset(2,1);drawSetup();$('mode').hidden=false;
 if(SAVED&&SAVED.tiles&&SAVED.tot){$('mode').hidden=true;$('rsum').textContent=SAVED.NAMES.slice(0,SAVED.NP).join(', ')+' · round '+SAVED.round+' of '+SAVED.R;$('res').hidden=false}
 addEventListener('resize',()=>els.forEach((_,i)=>place(i)));
+if(OSAVED&&OSAVED.state&&!new URLSearchParams(location.search).get('room')){$o('mode').hidden=true;$o('rsum').textContent='Online game · room '+OSAVED.code+' · '+OSAVED.state.NAMES.slice(0,OSAVED.state.NP).join(', ');$o('res').hidden=false}
 {const q=new URLSearchParams(location.search).get('room');if(q){showOnline();$o('ocd').value=q.toUpperCase().slice(0,4)}}
 </script></body></html>
