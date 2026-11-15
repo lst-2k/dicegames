@@ -29,7 +29,7 @@ td.sel{outline:3px solid var(--ink);outline-offset:-3px}
 .pl span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:6px}.pl b{font-size:1.3em}
 .felt{background:radial-gradient(ellipse at 50% 30%,var(--felt),var(--felt2));border:10px solid var(--wood);border-radius:26px;box-shadow:inset 0 0 30px #0007,0 4px 12px #0004;padding:12px;color:#f6efd0}
 .lab{font-size:.8em;opacity:.8;margin:4px 0 4px 2px;letter-spacing:.04em}
-#tbl{position:relative;height:332px;perspective:900px;margin-top:2px}
+#tbl{position:relative;height:432px;perspective:900px;margin-top:2px}
 .kz{position:absolute;left:0;right:0;top:0;height:68px;border:2px dashed #e2b94a99;background:#0003;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:.85em;opacity:.8;box-sizing:border-box}
 .dw{position:absolute;width:48px;height:48px;cursor:pointer;transition:left .9s cubic-bezier(.25,.8,.3,1),top .9s cubic-bezier(.3,1.5,.5,1),transform .9s,opacity .3s;filter:drop-shadow(0 8px 5px #0007)}
 .dw.held{filter:drop-shadow(0 0 6px #ffd45a) drop-shadow(0 0 2px #ffd45a)}
@@ -38,10 +38,10 @@ td.sel{outline:3px solid var(--ink);outline-offset:-3px}
 .f i{width:9px;height:9px;border-radius:50%;background:#1c1710;align-self:center;justify-self:center;box-shadow:inset 0 1px 2px #000a}
 .f1{transform:translateZ(24px)}.f6{transform:rotateY(180deg) translateZ(24px)}.f2{transform:rotateY(90deg) translateZ(24px)}.f5{transform:rotateY(-90deg) translateZ(24px)}.f3{transform:rotateX(90deg) translateZ(24px)}.f4{transform:rotateX(-90deg) translateZ(24px)}
 .bar{display:flex;justify-content:center;margin-top:8px;text-align:center}
-#cup{width:84px;height:100px;border:0;cursor:pointer;background:none;position:absolute;left:calc(50% - 42px);top:226px;z-index:5;color:var(--gold);font:700 .95em Georgia,serif;text-shadow:0 1px 2px #000;display:flex;align-items:flex-end;justify-content:center;padding:0 0 13px;box-sizing:border-box;transform-origin:50% 100%;-webkit-tap-highlight-color:transparent}
+#cup{width:84px;height:100px;border:0;cursor:pointer;background:none;position:absolute;left:calc(50% - 42px);top:326px;z-index:5;color:var(--gold);font:700 .95em Georgia,serif;text-shadow:0 1px 2px #000;display:flex;align-items:flex-end;justify-content:center;padding:0 0 13px;box-sizing:border-box;transform-origin:50% 100%;-webkit-tap-highlight-color:transparent}
 #cup svg{position:absolute;left:0;top:0;width:84px;height:100px}
 #cup span{position:relative}
-.cs{position:absolute;left:calc(50% - 50px);top:318px;width:100px;height:14px;border-radius:50%;background:radial-gradient(ellipse,#0009,#0000 70%);z-index:1}
+.cs{position:absolute;left:calc(50% - 50px);top:418px;width:100px;height:14px;border-radius:50%;background:radial-gradient(ellipse,#0009,#0000 70%);z-index:1}
 #cup:disabled{cursor:default;color:var(--gold)}
 #cup.tip{transform:rotate(-62deg) translate(-8px,-10px);transition:transform .25s}
 .dw.rattle{animation:rat .16s linear infinite}
@@ -67,6 +67,8 @@ tr.tot td{font-weight:700;font-size:1.1em;border-top:2px solid var(--ink)}
 @media (prefers-reduced-motion:reduce){.tumble,.land,#cup.shake{animation:none}}
 .box input{display:block;width:100%;box-sizing:border-box;margin:6px 0;padding:9px 10px;font:1em Georgia,serif;border-radius:8px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
 #oshare{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}#oshare button,#opl{margin-top:8px}#opl{line-height:1.7}
+#toast{position:fixed;left:50%;top:calc(10px + env(safe-area-inset-top,0px));transform:translate(-50%,-200%);max-width:88%;padding:12px 18px;border-radius:14px;background:var(--gold);color:#201c14;font:700 1em Georgia,serif;text-align:center;box-shadow:0 6px 18px #0007;z-index:25;transition:transform .45s cubic-bezier(.2,.9,.3,1.2);pointer-events:none}
+#toast.show{transform:translate(-50%,0)}
 </style></head><body>
 <!-- Floating Menu Button & Popup (Top Left) -->
 <div id="portal-menu-container" style="position: fixed; top: 12px; left: 25px; z-index: 9999; font-family: sans-serif;">
@@ -115,6 +117,7 @@ tr.tot td{font-weight:700;font-size:1.1em;border-top:2px solid var(--ink)}
  <div style="text-align:center;margin:12px"><button class="nb" onclick="askNew()">New game</button> <button class="nb" id="snd" onclick="mute()">Sound: on</button></div>
 </div>
 <div id="sheet"><div id="grab" onclick="togg()"><i></i><span id="gt"></span></div><div id="tabs"></div><div id="sbody"><table id="card"></table></div></div>
+<div id="toast" role="status" aria-live="polite"></div>
 <div id="cf" hidden><span id="cft"></span><button onclick="pick(sel)">Confirm</button><button class="no" onclick="sel=null;render()">Cancel</button></div>
 <div class="modal" id="mode"><div class="box"><h2>Roll the Dice</h2><div>How many players?</div><div id="cnt" class="seg"></div><div id="names"></div><button onclick="begin()">Start game</button> <button class="nb" onclick="showOnline()">🌐 Play online</button></div></div>
 <div class="modal" id="conf" hidden><div class="box"><h2>Start a new game?</h2><div>Your current game will be lost.</div><button onclick="document.getElementById('conf').hidden=true;clearSave();showSetup()">Yes, new game</button> <button class="nb" onclick="document.getElementById('conf').hidden=true">Keep playing</button></div></div>
@@ -130,7 +133,7 @@ const CATS=['Ones','Twos','Threes','Fours','Fives','Sixes','3 of a kind','4 of a
 const PIPS={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
 const NAMES=['Player 1','Player 2','Player 3','Player 4'];const COL=['#2f6fd6','#c9503f','#8a4fc2','#d98b1f'];let typed=['','','',''],SEL=2,vp=0,open=false;
 function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
-let done=false,allT,tid=0,sel=null,NP=2,cur,dice,order,rolls,busy,sc,ax=[0,0,0,0,0],ay=[0,0,0,0,0],tp=[],ta=[0,0,0,0,0],els=[];
+let bon=[0,0,0,0],done=false,allT,tid=0,sel=null,NP=2,cur,dice,order,rolls,busy,sc,ax=[0,0,0,0,0],ay=[0,0,0,0,0],tp=[],ta=[0,0,0,0,0],els=[];
 const BASE={1:[0,0],6:[0,180],2:[0,-90],5:[0,90],3:[-90,0],4:[90,0]};
 let AC=null,muted=false;
 function ac(){if(muted)return null;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state=='suspended')AC.resume()}catch(e){return null}return AC}
@@ -157,28 +160,28 @@ function showSetup(){oleave();document.getElementById('over').hidden=true;drawSe
 function begin(){for(let p=0;p<4;p++)NAMES[p]=typed[p].trim()||'Player '+(p+1);document.getElementById('mode').hidden=true;reset(SEL)}
 const KEY='rtd-save';
 function inProgress(){return rolls>0||sc.slice(0,NP).some(a=>a.some(v=>v!=null))}
-function save(){if(ON.on)return;try{if(done||!inProgress())localStorage.removeItem(KEY);else localStorage.setItem(KEY,JSON.stringify({NP,NAMES,sc,cur,dice,order,rolls}))}catch(e){}}
+function save(){if(ON.on)return;try{if(done||!inProgress())localStorage.removeItem(KEY);else localStorage.setItem(KEY,JSON.stringify({NP,NAMES,bon,sc,cur,dice,order,rolls}))}catch(e){}}
 function clearSave(){try{localStorage.removeItem(KEY)}catch(e){}}
 function load(){try{return JSON.parse(localStorage.getItem(KEY))}catch(e){return null}}
 function askNew(){if(inProgress()&&!done)document.getElementById('conf').hidden=false;else showSetup()}
 function resume(d){
- if(!d)return;NP=d.NP;d.NAMES.forEach((n,i)=>NAMES[i]=n);sc=d.sc;while(sc.length<4)sc.push(Array(13).fill(null));cur=d.cur;vp=cur;open=false;done=false;dice=d.dice;order=d.order;rolls=d.rolls;busy=0;sel=null;tid++;
+ if(!d)return;NP=d.NP;d.NAMES.forEach((n,i)=>NAMES[i]=n);bon=d.bon||[0,0,0,0];sc=d.sc;while(sc.length<4)sc.push(Array(13).fill(null));cur=d.cur;vp=cur;open=false;done=false;dice=d.dice;order=d.order;rolls=d.rolls;busy=0;sel=null;tid++;
  tp=[];dice.forEach((v,i)=>{ax[i]=BASE[v][0];ay[i]=BASE[v][1];els[i].style.zIndex=rolls?2:3;els[i].classList.remove('rattle')});
  if(rolls>0)dice.forEach((_,i)=>{if(!order.includes(i)){tp[i]=rand(i);ta[i]=Math.round(Math.random()*80-40)}});
  ['res','mode','over','conf'].forEach(k=>document.getElementById(k).hidden=true);
  render();if(rolls>=3||order.length==5){const t=tid;setTimeout(()=>{if(t==tid){open=true;render()}},1500)}
 }
 function togg(){open=!open;render()}
-function reset(n){if(n)NP=n;vp=0;open=false;done=false;cur=0;sc=Array.from({length:4},()=>Array(13).fill(null));turn();document.getElementById('over').hidden=true;render()}
+function reset(n){if(n)NP=n;vp=0;open=false;done=false;cur=0;bon=[0,0,0,0];sc=Array.from({length:4},()=>Array(13).fill(null));turn();document.getElementById('over').hidden=true;render()}
 function turn(){tid++;sel=null;dice=[1,2,3,4,5];order=[];rolls=0;busy=0;dice.forEach((v,i)=>{ax[i]=BASE[v][0];ay[i]=BASE[v][1];tp[i]=null;els[i]&&(els[i].style.zIndex=3)})}
 function W(){return tbl().clientWidth}
 function slot(k){const w=W(),g=Math.max(2,Math.min(8,(w-248)/4)),t=5*48+4*g;return [(w-t)/2+k*(48+g),10]}
-function rand(i){const w=W();for(let t=0;t<40;t++){const p=[6+Math.random()*(w-60),84+Math.random()*86];if(tp.every((q,j)=>j==i||!q||order.includes(j)||Math.hypot(q[0]-p[0],q[1]-p[1])>54))return p}return [6+Math.random()*(w-60),100]}
+function rand(i){const w=W();for(let t=0;t<40;t++){const p=[6+Math.random()*(w-60),84+Math.random()*186];if(tp.every((q,j)=>j==i||!q||order.includes(j)||Math.hypot(q[0]-p[0],q[1]-p[1])>54))return p}return [6+Math.random()*(w-60),100]}
 function place(i,fly){
  const w=els[i],k=order.indexOf(i);let x,y,a;
  if(k>=0){[x,y]=slot(k);a=0}
  else if(tp[i]){[x,y]=tp[i];a=ta[i]}
- else{x=W()/2-42+14+(i%3)*8+(i>2?4:0);y=212+(i%2)*4;a=0}
+ else{x=W()/2-42+14+(i%3)*8+(i>2?4:0);y=312+(i%2)*4;a=0}
  w.style.left=x+'px';w.style.top=y+'px';w.style.transform='rotate('+a+'deg)';w.classList.toggle('held',k>=0);w.style.opacity=(k<0&&!tp[i]&&!fly)?0:1;
  w.firstChild.style.transform='rotateX(-10deg) rotateY(-12deg) rotateX('+ax[i]+'deg) rotateY('+ay[i]+'deg)';
  w.setAttribute('aria-label','Die showing '+dice[i]+(k>=0?', kept':''))}
@@ -195,13 +198,13 @@ function roll(f){
     ax[i]=Math.ceil(ax[i]/360)*360+360*(2+Math.floor(Math.random()*2))+BASE[v][0];
     ay[i]=Math.ceil(ay[i]/360)*360+360*(2+Math.floor(Math.random()*2))+BASE[v][1];
     tp[i]=rand(i);ta[i]=Math.round(Math.random()*80-40);place(i)});
-   setTimeout(()=>{cup.classList.remove('tip');idx.forEach(i=>els[i].style.zIndex=2);busy=0;render();if(rolls>=3){const t=tid;setTimeout(()=>{if(t==tid&&rolls>=3){open=true;render()}},3000)}},1150)},700)},550);
+   setTimeout(()=>{cup.classList.remove('tip');idx.forEach(i=>els[i].style.zIndex=2);busy=0;render();if(bonusNow())toast('Another 5 of a kind! +50 bonus when you score');if(rolls>=3){const t=tid;setTimeout(()=>{if(t==tid&&rolls>=3){open=true;render()}},3000)}},1150)},700)},550);
 }
 function toggle(i){if(busy||!rolls||!mine())return;sel=null;setTimeout(()=>osend('keep',order),0);const k=order.indexOf(i);if(k>=0){order.splice(k,1);tone(520,0,.09,.14,'square')}else{order.push(i);sBlip()}clearTimeout(allT);if(order.length==5){const t=tid;allT=setTimeout(()=>{if(t==tid&&order.length==5&&!busy){open=true;render()}},3000)}render()}
 function choose(i){if(busy||!rolls||!mine()||sc[cur][i]!=null)return;sel=i;render()}
 function pick(i){
  if(busy||!rolls||!mine()||sc[cur][i]!=null)return;sel=null;pot(dice,i)?sDing():tone(180,0,.25,.2,'triangle');
- sc[cur][i]=pot(dice,i);osend('score',{sc});
+ const pv=pot(dice,i),isB=bonusNow();if(isB)bon[cur]++;sc[cur][i]=pv;osend('score',{sc,i,v:pv,by:cur,bon,b:isB});toastScore(cur,pv,i,isB);
  if(sc.slice(0,NP).every(a=>a.every(v=>v!=null))){turn();render();finish();return}
  cur=(cur+1)%NP;turn();vp=cur;open=false;render();
 }
@@ -217,7 +220,7 @@ function finish(){
  open=false;render();clearSave();document.getElementById('over').hidden=false;
 }
 function ui(){
- const cup=document.getElementById('cup');cup.disabled=busy||rolls>=3||order.length==5||!mine();document.getElementById('cl').textContent=rolls==0?'Roll':'Roll';
+ const cup=document.getElementById('cup');cup.disabled=busy||rolls>=3||order.length==5||!mine();document.getElementById('cl').textContent=rolls==0?'Roll':'Roll again';
  document.getElementById('info').textContent=busy?'Rolling…':order.length==5?'All dice kept. The scorecard will open shortly.':rolls==0?(NP==1?'Shake the cup to start your turn.':NAMES[cur]+', shake the cup to start your turn.'):rolls<3?(3-rolls)+' roll'+(3-rolls>1?'s':'')+' left. Tap dice to keep them, then roll again, or slide up the scorecard to score.':'No rolls left. Pick a score on the scorecard.';
 }
 function pot(d,i){
@@ -235,7 +238,8 @@ function pot(d,i){
   default:return s}
 }
 function upper(p){return sc[p].slice(0,6).reduce((a,b)=>a+(b||0),0)}
-function total(p){const lo=sc[p].slice(6).reduce((a,b)=>a+(b||0),0);const u=upper(p);return u+(u>=63?35:0)+lo}
+const bonusNow=()=>rolls>0&&sc[cur][11]===50&&dice.every(v=>v==dice[0]);
+function total(p){const lo=sc[p].slice(6).reduce((a,b)=>a+(b||0),0);const u=upper(p);return u+(u>=63?35:0)+lo+(bon[p]||0)*50}
 function render(){
  document.getElementById('top').innerHTML=PL().map(p=>'<div class="pl'+(p==cur?' on':'')+'" style="border-left:6px solid '+COL[p]+'"><span>'+esc(NAMES[p])+'</span><b>'+total(p)+' pts</b></div>').join('');
  els.forEach((_,i)=>{if(!busy)place(i)});
@@ -247,7 +251,7 @@ function render(){
  document.getElementById('tabs').innerHTML=PL().map(p=>'<button class="tab'+(p==vp?' on':'')+'" style="--c:'+COL[p]+'" onclick="vp='+p+';render()">'+esc(NAMES[p])+' · '+total(p)+' pts</button>').join('');
  const live=vp==cur&&rolls&&!busy&&mine();let best=-1,bv=0;
  if(live)CATS.forEach((_,i)=>{if(sc[cur][i]==null){const v=pot(dice,i);if(v>bv){bv=v;best=i}}});
- let h=(live?'<caption>Points you can score now are highlighted. ★ = highest. Tap one to take it.</caption>':vp!=cur&&NP>1?'<caption>Viewing '+esc(NAMES[vp])+'’s card. It’s '+esc(NAMES[cur])+'’s turn.</caption>':'')+'<tr><th>Score</th><th style="background:'+COL[vp]+';color:#fff">'+esc(NAMES[vp])+'</th></tr>';
+ let h=(live?'<caption>Points you can score now are highlighted. ★ = highest. Tap one to take it.'+(bonusNow()?' <b>Another 5 of a kind: +50 bonus!</b>':'')+'</caption>':vp!=cur&&NP>1?'<caption>Viewing '+esc(NAMES[vp])+'’s card. It’s '+esc(NAMES[cur])+'’s turn.</caption>':'')+'<tr><th>Score</th><th style="background:'+COL[vp]+';color:#fff">'+esc(NAMES[vp])+'</th></tr>';
  CATS.forEach((n,i)=>{
   if(i==6)h+='<tr class="sub"><td>Upper bonus (63+ = 35)</td><td>'+upper(vp)+'/63'+(upper(vp)>=63?' ✓':'')+'</td></tr>';
   const v=sc[vp][i];let cell;
@@ -255,15 +259,18 @@ function render(){
   else if(live){const q=pot(dice,i);cell='<td class="opt'+(i==sel?' sel':'')+'" onclick="choose('+i+')"><span class="chip'+(q==0?' z':'')+(i==best?' best':'')+'">'+(i==best?'★ ':'')+q+'</span></td>'}
   else cell='<td></td>';
   h+='<tr class="'+(v==null&&live&&pot(dice,i)>0?'can':'')+'"><td>'+n+'</td>'+cell+'</tr>'});
+ h+='<tr class="sub"><td>5 of a kind bonus (+50 each)</td><td>'+((bon[vp]||0)*50||'–')+'</td></tr>';
  h+='<tr class="tot"><td>Total</td><td>'+total(vp)+'</td></tr>';
  document.getElementById('card').innerHTML=h;
  if(!busy)save();
  const cf=document.getElementById('cf'),ok=live&&sel!=null&&sc[cur][sel]==null;cf.hidden=!ok;
- if(ok){const v=pot(dice,sel);document.getElementById('cft').innerHTML='Score <b>'+v+'</b> for '+CATS[sel]+'?'+(v==0?' <b style="color:#c0392b">That scores zero!</b>':'')}
+ if(ok){const v=pot(dice,sel);document.getElementById('cft').innerHTML='Score <b>'+v+'</b> for '+CATS[sel]+'?'+(bonusNow()?' <b>+50 bonus!</b>':'')+(v==0?' <b style="color:#c0392b">That scores zero!</b>':'')}
 }
 
+let toastT;function toast(m){const e=document.getElementById('toast');e.textContent=m;e.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('show'),4500)}
+function toastScore(by,v,i,b){toast(NAMES[by]+(v?' added '+v+' point'+(v==1?'':'s')+' in ':' scratched ')+CATS[i]+(v?'':' (0 points)')+(b?' + 50 bonus for another 5 of a kind!':''))}
 const HOOK={key:'rtd',file:'roll-the-dice.html',title:'Roll the Dice',opts:()=>({}),start:p=>reset(p.ids.length),
- ev(t,p){if(t=='roll')roll(p);else if(t=='keep'){order=p;sel=null;render()}else if(t=='score'){sc=p.sc;if(sc.slice(0,NP).every(a=>a.every(v=>v!=null))){turn();render();finish()}else{cur=(cur+1)%NP;turn();vp=cur;open=false;render()}}}};
+ ev(t,p){if(t=='roll')roll(p);else if(t=='keep'){order=p;sel=null;render()}else if(t=='score'){toastScore(p.by,p.v,p.i,p.b);bon=p.bon||bon;sc=p.sc;if(sc.slice(0,NP).every(a=>a.every(v=>v!=null))){turn();render();finish()}else{cur=(cur+1)%NP;turn();vp=cur;open=false;render()}}}};
 
 /* ---- online play (Supabase Realtime Broadcast + Presence) ---- */
 const SB_URL='https://ajsausfqqmjglkapornk.supabase.co',SB_KEY='sb_publishable_2Uygqu-sr--sl0OVsZpwbQ_IAXYfYzw',SITE='https://lst-2k.github.io/dicegames/';
