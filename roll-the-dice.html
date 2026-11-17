@@ -70,49 +70,12 @@ tr.tot td{font-weight:700;font-size:1.1em;border-top:2px solid var(--ink)}
 #toast{position:fixed;left:50%;top:calc(10px + env(safe-area-inset-top,0px));transform:translate(-50%,-200%);max-width:88%;padding:12px 18px;border-radius:14px;background:var(--gold);color:#201c14;font:700 1em Georgia,serif;text-align:center;box-shadow:0 6px 18px #0007;z-index:25;transition:transform .45s cubic-bezier(.2,.9,.3,1.2);pointer-events:none}
 #toast.show{transform:translate(-50%,0)}
 </style></head><body>
-<!-- Floating Menu Button & Popup (Top Left) -->
-<div id="portal-menu-container" style="position: fixed; top: 12px; left: 25px; z-index: 9999; font-family: sans-serif;">
-    
-    <!-- 3-Line Square Menu Button -->
-    <button onclick="togglePortalMenu()" 
-            title="Menu"
-            style="width: 42px; height: 42px; background: #061811; color: #d4af37; border: 2px solid #d4af37; border-radius: 8px; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
-        <span style="width: 20px; height: 2px; background-color: #d4af37; border-radius: 2px; transition: 0.3s;"></span>
-        <span style="width: 20px; height: 2px; background-color: #d4af37; border-radius: 2px; transition: 0.3s;"></span>
-        <span style="width: 20px; height: 2px; background-color: #d4af37; border-radius: 2px; transition: 0.3s;"></span>
-    </button>
-
-    <!-- Hidden Dropdown Menu (Opens Downward) -->
-    <div id="portal-menu-dropdown" style="display: none; margin-top: 10px; background: #061811; border: 2px solid #d4af37; border-radius: 10px; padding: 8px; box-shadow: 0 8px 20px rgba(0,0,0,0.6); min-width: 150px;">
-        <a href="https://lst-2k.github.io/mindgames/" 
-           style="display: flex; align-items: center; justify-content: center; gap: 8px; color: #d4af37; text-decoration: none; font-size: 13px; font-weight: bold; padding: 8px 12px; border-radius: 6px; background: rgba(212, 175, 55, 0.1); transition: background 0.2s;"
-           onmouseover="this.style.background='rgba(212, 175, 55, 0.25)'" 
-           onmouseout="this.style.background='rgba(212, 175, 55, 0.1)'">
-           ← Back to Games
-        </a>
-    </div>
-</div>
-
-<script>
-    function togglePortalMenu() {
-        const menu = document.getElementById('portal-menu-dropdown');
-        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
-    }
-
-    // Close menu when clicking outside of it
-    document.addEventListener('click', function(event) {
-        const container = document.getElementById('portal-menu-container');
-        if (container && !container.contains(event.target)) {
-            document.getElementById('portal-menu-dropdown').style.display = 'none';
-        }
-    });
-</script>
 <div id="app">
  <div class="gt">Roll the Dice</div>
  <div class="top" id="top"></div>
  <div class="felt">
   <div id="tbl"><div class="kz" id="kz">Tap a die to keep it</div><div class="cs"></div><button id="cup" onclick="roll()"><svg viewBox="0 0 84 100" aria-hidden="true"><defs><linearGradient id="cg" x1="0" x2="1"><stop offset="0" stop-color="#6b4c0c"/><stop offset=".4" stop-color="#f2d36f"/><stop offset=".7" stop-color="#a8801c"/><stop offset="1" stop-color="#5e420a"/></linearGradient></defs><path d="M0 13 L11 92 C14 101 70 101 73 92 L84 13 Z" fill="#7a4a24"/><path d="M4.3 44 L79.7 44 L80.3 50 L3.7 50 Z" fill="url(#cg)"/><ellipse cx="42" cy="13" rx="40.5" ry="11" fill="#1a0e05" stroke="#e2b94a" stroke-width="3"/><ellipse cx="42" cy="15" rx="34" ry="6.5" fill="#050200"/></svg><span id="cl">Roll</span></button></div>
-  <div class="bar"><div id="info"></div></div>
+  <div class="bar"><div id="info"></div></div><div style="text-align:center"><button class="nb" id="skipb" hidden onclick="skipP()"></button></div>
  </div>
  <div style="text-align:center;margin:12px"><button class="nb" onclick="askNew()">New game</button> <button class="nb" id="snd" onclick="mute()">Sound: on</button></div>
 </div>
@@ -133,7 +96,7 @@ const CATS=['Ones','Twos','Threes','Fours','Fives','Sixes','3 of a kind','4 of a
 const PIPS={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
 const NAMES=['Player 1','Player 2','Player 3','Player 4'];const COL=['#2f6fd6','#c9503f','#8a4fc2','#d98b1f'];let typed=['','','',''],SEL=2,vp=0,open=false;
 function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
-let bon=[0,0,0,0],done=false,allT,tid=0,sel=null,NP=2,cur,dice,order,rolls,busy,sc,ax=[0,0,0,0,0],ay=[0,0,0,0,0],tp=[],ta=[0,0,0,0,0],els=[];
+let out=[false,false,false,false],bon=[0,0,0,0],done=false,allT,tid=0,sel=null,NP=2,cur,dice,order,rolls,busy,sc,ax=[0,0,0,0,0],ay=[0,0,0,0,0],tp=[],ta=[0,0,0,0,0],els=[];
 const BASE={1:[0,0],6:[0,180],2:[0,-90],5:[0,90],3:[-90,0],4:[90,0]};
 let AC=null,muted=false;
 function ac(){if(muted)return null;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state=='suspended')AC.resume()}catch(e){return null}return AC}
@@ -165,14 +128,14 @@ function clearSave(){try{localStorage.removeItem(KEY);localStorage.removeItem('o
 function load(){try{return JSON.parse(localStorage.getItem(KEY))}catch(e){return null}}
 function askNew(){if(inProgress()&&!done)document.getElementById('conf').hidden=false;else showSetup()}
 function resume(d){
- if(!d)return;NP=d.NP;d.NAMES.forEach((n,i)=>NAMES[i]=n);bon=d.bon||[0,0,0,0];sc=d.sc;while(sc.length<4)sc.push(Array(13).fill(null));cur=d.cur;vp=cur;open=false;done=false;dice=d.dice;order=d.order;rolls=d.rolls;busy=0;sel=null;tid++;
+ if(!d)return;NP=d.NP;d.NAMES.forEach((n,i)=>NAMES[i]=n);bon=d.bon||[0,0,0,0];out=d.out||[false,false,false,false];sc=d.sc;while(sc.length<4)sc.push(Array(13).fill(null));cur=d.cur;vp=cur;open=false;done=false;dice=d.dice;order=d.order;rolls=d.rolls;busy=0;sel=null;tid++;
  tp=[];dice.forEach((v,i)=>{ax[i]=BASE[v][0];ay[i]=BASE[v][1];els[i].style.zIndex=rolls?2:3;els[i].classList.remove('rattle')});
  if(rolls>0)dice.forEach((_,i)=>{if(!order.includes(i)){tp[i]=rand(i);ta[i]=Math.round(Math.random()*80-40)}});
  ['res','mode','over','conf'].forEach(k=>document.getElementById(k).hidden=true);
  render();if(rolls>=3||order.length==5){const t=tid;setTimeout(()=>{if(t==tid){open=true;render()}},1500)}
 }
 function togg(){open=!open;render()}
-function reset(n){if(n)NP=n;vp=0;open=false;done=false;cur=0;bon=[0,0,0,0];sc=Array.from({length:4},()=>Array(13).fill(null));turn();document.getElementById('over').hidden=true;render()}
+function reset(n){if(n)NP=n;vp=0;open=false;done=false;cur=0;bon=[0,0,0,0];out=[false,false,false,false];sc=Array.from({length:4},()=>Array(13).fill(null));turn();document.getElementById('over').hidden=true;render()}
 function turn(){tid++;sel=null;dice=[1,2,3,4,5];order=[];rolls=0;busy=0;dice.forEach((v,i)=>{ax[i]=BASE[v][0];ay[i]=BASE[v][1];tp[i]=null;els[i]&&(els[i].style.zIndex=3)})}
 function W(){return tbl().clientWidth}
 function slot(k){const w=W(),g=Math.max(2,Math.min(8,(w-248)/4)),t=5*48+4*g;return [(w-t)/2+k*(48+g),10]}
@@ -205,22 +168,22 @@ function choose(i){if(busy||!rolls||!mine()||sc[cur][i]!=null)return;sel=i;rende
 function pick(i){
  if(busy||!rolls||!mine()||sc[cur][i]!=null)return;sel=null;pot(dice,i)?sDing():tone(180,0,.25,.2,'triangle');
  const pv=pot(dice,i),isB=bonusNow();if(isB)bon[cur]++;sc[cur][i]=pv;osend('score',{sc,i,v:pv,by:cur,bon,b:isB});toastScore(cur,pv,i,isB);
- if(sc.slice(0,NP).every(a=>a.every(v=>v!=null))){turn();render();finish();return}
- cur=(cur+1)%NP;turn();vp=cur;open=false;render();
+ if(allDone()){turn();render();finish();return}
+ cur=nextCur();turn();vp=cur;open=false;render();
 }
 function finish(){
  done=true;
- const r=PL().map(p=>[p,total(p)]).sort((a,b)=>b[1]-a[1]);
+ const r=PL().filter(p=>!out[p]).map(p=>[p,total(p)]).sort((a,b)=>b[1]-a[1]);
  if(NP==1){let best=r[0][1];try{best=Math.max(best,+localStorage.getItem('dicecup-best')||0);localStorage.setItem('dicecup-best',best)}catch(e){}
   document.getElementById('win').textContent='Game over';
   document.getElementById('fin').textContent='Your score: '+r[0][1]+' pts · Best: '+best+' pts'}
  else{const w=r.filter(x=>x[1]==r[0][1]);
   document.getElementById('win').textContent=w.length>1?'It’s a tie: '+w.map(x=>NAMES[x[0]]).join(' & '):NAMES[r[0][0]]+' wins!';
-  document.getElementById('fin').innerHTML=r.map(x=>esc(NAMES[x[0]])+' · '+x[1]+' pts').join('<br>')}
+  document.getElementById('fin').innerHTML=r.map(x=>esc(NAMES[x[0]])+' · '+x[1]+' pts').join('<br>')+PL().filter(p=>out[p]).map(p=>'<br>'+esc(NAMES[p])+' · left the game').join('')}
  open=false;render();clearSave();document.getElementById('over').hidden=false;
 }
 function ui(){
- const cup=document.getElementById('cup');cup.disabled=busy||rolls>=3||order.length==5||!mine();document.getElementById('cl').textContent=rolls==0?'Roll':'Roll';
+ const cup=document.getElementById('cup');cup.disabled=busy||rolls>=3||order.length==5||!mine();document.getElementById('cl').textContent=rolls==0?'Roll':'Roll again';
  document.getElementById('info').textContent=busy?'Rolling…':order.length==5?'All dice kept. The scorecard will open shortly.':rolls==0?(NP==1?'Shake the cup to start your turn.':NAMES[cur]+', shake the cup to start your turn.'):rolls<3?(3-rolls)+' roll'+(3-rolls>1?'s':'')+' left. Tap dice to keep them, then roll again, or slide up the scorecard to score.':'No rolls left. Pick a score on the scorecard.';
 }
 function pot(d,i){
@@ -241,10 +204,12 @@ function upper(p){return sc[p].slice(0,6).reduce((a,b)=>a+(b||0),0)}
 const bonusNow=()=>rolls>0&&sc[cur][11]===50&&dice.every(v=>v==dice[0]);
 function total(p){const lo=sc[p].slice(6).reduce((a,b)=>a+(b||0),0);const u=upper(p);return u+(u>=63?35:0)+lo+(bon[p]||0)*50}
 function render(){
- document.getElementById('top').innerHTML=PL().map(p=>'<div class="pl'+(p==cur?' on':'')+'" style="border-left:6px solid '+COL[p]+'"><span>'+esc(NAMES[p])+'</span><b>'+total(p)+' pts</b></div>').join('');
+ document.getElementById('top').innerHTML=PL().map(p=>'<div class="pl'+(p==cur?' on':'')+'" style="border-left:6px solid '+COL[p]+'"><span>'+esc(NAMES[p])+(out[p]?' (left)':'')+'</span><b>'+total(p)+' pts</b></div>').join('');
  els.forEach((_,i)=>{if(!busy)place(i)});
  document.getElementById('kz').style.visibility=order.length?'hidden':'visible';
  ui();if(ON.on&&!mine()&&!busy)document.getElementById('info').textContent=NAMES[cur]+' is playing…';
+ if(ON.on&&ON.gone&&ON.gone[cur]&&!mine()&&!busy)document.getElementById('info').textContent=NAMES[cur]+' has disconnected. Waiting for them to rejoin…';
+ {const sb=document.getElementById('skipb'),sk=ON.on&&!mine()&&canSkip();sb.hidden=!sk;if(sk)sb.textContent='Remove '+NAMES[cur]+' and continue'}
  if(vp>=NP)vp=0;
  document.getElementById('sheet').classList.toggle('open',open);
  document.getElementById('gt').textContent=open?'▼ Close scorecard':'▲ Scorecards · tap to open';
@@ -267,17 +232,21 @@ function render(){
  if(ok){const v=pot(dice,sel);document.getElementById('cft').innerHTML='Score <b>'+v+'</b> for '+CATS[sel]+'?'+(bonusNow()?' <b>+50 bonus!</b>':'')+(v==0?' <b style="color:#c0392b">That scores zero!</b>':'')}
 }
 
+const allDone=()=>PL().filter(p=>!out[p]).every(p=>sc[p].every(v=>v!=null));
+function nextCur(){let c=cur;do{c=(c+1)%NP}while(out[c]);return c}
+function applySkip(p){out[p]=true;if(allDone()){turn();render();finish();return}if(cur==p){cur=nextCur();turn();vp=cur;open=false}render()}
+function skipP(){if(!ON.on||mine()||!canSkip())return;if(!confirm('Remove '+NAMES[cur]+' from the game and continue without them?'))return;const sp=cur;applySkip(sp);osend('skip',{p:sp})}
 let toastT;function toast(m){const e=document.getElementById('toast');e.textContent=m;e.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('show'),4500)}
 function toastScore(by,v,i,b){toast(NAMES[by]+(v?' added '+v+' point'+(v==1?'':'s')+' in ':' scratched ')+CATS[i]+(v?'':' (0 points)')+(b?' + 50 bonus for another 5 of a kind!':''))}
-const HOOK={full:()=>({NP,NAMES,bon,sc,cur,dice,order,rolls}),set:d=>resume(d),key:'rtd',file:'roll-the-dice.html',title:'Roll the Dice',opts:()=>({}),start:p=>reset(p.ids.length),
- ev(t,p){if(t=='roll')roll(p);else if(t=='keep'){order=p;sel=null;render()}else if(t=='score'){toastScore(p.by,p.v,p.i,p.b);bon=p.bon||bon;sc=p.sc;if(sc.slice(0,NP).every(a=>a.every(v=>v!=null))){turn();render();finish()}else{cur=(cur+1)%NP;turn();vp=cur;open=false;render()}}}};
+const HOOK={full:()=>({out,NP,NAMES,bon,sc,cur,dice,order,rolls}),set:d=>resume(d),key:'rtd',file:'roll-the-dice.html',title:'Roll the Dice',opts:()=>({}),start:p=>reset(p.ids.length),
+ ev(t,p){if(t=='roll')roll(p);else if(t=='keep'){order=p;sel=null;render()}else if(t=='skip'){applySkip(p.p)}else if(t=='score'){toastScore(p.by,p.v,p.i,p.b);bon=p.bon||bon;sc=p.sc;if(allDone()){turn();render();finish()}else{cur=nextCur();turn();vp=cur;open=false;render()}}}};
 
 /* ---- online play (Supabase Realtime Broadcast + Presence) ---- */
 const SB_URL='https://ajsausfqqmjglkapornk.supabase.co',SB_KEY='sb_publishable_2Uygqu-sr--sl0OVsZpwbQ_IAXYfYzw',SITE='https://lst-2k.github.io/dicegames/';
 const $o=id=>document.getElementById(id);
 const ON={seq:0,on:false,me:-1,host:false,code:'',ch:null,sb:null,peers:[],ids:[],id:Math.random().toString(36).slice(2,9)};
 const mine=()=>!ON.on||ON.me==cur;
-function osend(t,p){if(!(ON.ch&&(ON.on||t=='start')))return;const n=(t=='hello'||t=='full'||t=='start')?ON.seq:++ON.seq;ON.ch.send({type:'broadcast',event:'g',payload:{t,p,from:ON.id,n}})}
+function osend(t,p){if(!(ON.ch&&(ON.on||t=='start'||t=='who')))return;const n=(t=='hello'||t=='full'||t=='start'||t=='who'||t=='seats')?ON.seq:++ON.seq;ON.ch.send({type:'broadcast',event:'g',payload:{t,p,from:ON.id,n}})}
 function oerr(m){$o('oerr').textContent=m||''}
 function showOnline(){$o('mode').hidden=true;$o('res').hidden=true;$o('o1').hidden=false;$o('o2').hidden=true;oerr();$o('onl').hidden=false}
 function rcode(){const a='ABCDEFGHJKLMNPQRSTUVWXYZ';let s='';for(let i=0;i<4;i++)s+=a[Math.floor(Math.random()*a.length)];return s}
@@ -288,14 +257,16 @@ function oconnect(name,host,re){
  if(!re)oleave();ON.host=host;ON.sb=ON.sb||supabase.createClient(SB_URL,SB_KEY);
  const ch=ON.ch=ON.sb.channel('game-'+HOOK.key+'-'+ON.code,{config:{broadcast:{self:false},presence:{key:ON.id}}});
  ch.on('broadcast',{event:'g'},({payload})=>oget(payload))
-  .on('presence',{event:'sync'},()=>{const s=ch.presenceState();ON.peers=Object.entries(s).map(([k,v])=>({id:k,name:v[0].name,host:v[0].host,t:v[0].t})).sort((a,b)=>(b.host?1:0)-(a.host?1:0)||a.t-b.t);olobby()})
-  .subscribe(async st=>{if(st=='SUBSCRIBED'){await ch.track({name,host,t:Date.now()});olobby();if(ON.on)osend('hello',{})}else if(st=='CHANNEL_ERROR'||st=='TIMED_OUT')oerr('Could not connect. Try again.')});
+  .on('presence',{event:'sync'},()=>{const s=ch.presenceState();ON.peers=Object.entries(s).map(([k,v])=>({id:k,name:v[0].name,host:v[0].host,t:v[0].t})).sort((a,b)=>(b.host?1:0)-(a.host?1:0)||a.t-b.t);if(ON.on){ON.gone=ON.ids.map(id=>!ON.peers.some(p=>p.id==id));ON.gT=ON.gT||{};ON.ids.forEach((id,k)=>{if(ON.gone[k]){if(!ON.gT[id])ON.gT[id]=Date.now()}else delete ON.gT[id]});if(ON.gone.some(Boolean))setTimeout(()=>{if(ON.on)render()},8500);render()}olobby()})
+  .subscribe(async st=>{if(st=='SUBSCRIBED'){await ch.track({name,host,t:Date.now()});olobby();if(ON.on)osend('hello',{});else osend('who',{})}else if(st=='CHANNEL_ERROR'||st=='TIMED_OUT')oerr('Could not connect. Try again.')});
  $o('o1').hidden=true;$o('o2').hidden=false;$o('ocode').textContent=ON.code;
  $o('oshare').innerHTML=(navigator.share?'<button class="nb" onclick="oshare()">Share…</button>':'')+'<button class="nb" onclick="oshare(\'wa\')">WhatsApp</button><button class="nb" onclick="oshare(\'sms\')">SMS</button><button class="nb" onclick="oshare(\'copy\')">Copy link</button>';
  $o('ocp').textContent=host?'Send the invite to your friends':'';
 }
 function olobby(){if(ON.on||!ON.ch)return;
  $o('opl').innerHTML=ON.peers.map((p,i)=>'<div>'+(i+1)+'. '+esc(p.name)+(p.host?' (host)':'')+'</div>').join('');
+ if(ON.seats){const free=ON.seats.ids.map((id,k)=>({id,k,n:ON.seats.names[k]})).filter(x=>!ON.peers.some(p=>p.id==x.id));
+  $o('ost').hidden=true;$o('owait').innerHTML='This game has already started. Tap your name to rejoin:<br>'+(free.length?free.map(x=>'<button class="nb" onclick="oclaim('+x.k+')">'+esc(x.n)+'</button>').join(' '):'No free seats.');return}
  const ready=ON.peers.some(p=>p.host);
  $o('ost').hidden=!ON.host;$o('ost').disabled=ON.peers.length<2;
  $o('owait').textContent=ON.host?(ON.peers.length<2?'Waiting for players to join…':'Ready when you are.'):ready?'Waiting for the host to start…':'Looking for the host…'}
@@ -309,7 +280,8 @@ function ostartGame(){const pr=ON.peers.slice(0,4);if(pr.length<2)return;const p
 function ostart(p){ON.seq=0;ON.on=true;ON.ids=p.ids;ON.me=p.ids.indexOf(ON.id);p.names.forEach((n,i)=>NAMES[i]=n);$o('onl').hidden=true;HOOK.start(p)}
 function oget(m){if(!m||m.from==ON.id)return;
  if(m.t=='start'&&!ON.on){ostart(m.p);return}
- if(!ON.on)return;
+ if(!ON.on){if(m.t=='seats'){ON.seats=m.p;olobby()}return}
+ if(m.t=='who'){osend('seats',{names:NAMES.slice(0,NP),ids:ON.ids});return}
  if(m.t=='hello'){if(ON.seq>m.n)osend('full',{s:HOOK.full()});else if(ON.seq<m.n)osend('hello',{});return}
  if(m.t=='full'){if(m.n>ON.seq){ON.seq=m.n;HOOK.set(m.p.s)}return}
  if(m.n>ON.seq+1){osend('hello',{});return}
@@ -319,12 +291,15 @@ const OSAVED=(()=>{try{return JSON.parse(localStorage.getItem('ol-'+HOOK.key))}c
 function orejoin(){const d=OSAVED;if(!d)return;if(typeof supabase==='undefined'){alert('Online play could not load. Check your connection.');return}
  ON.id=d.id;ON.code=d.code;ON.me=d.me;ON.ids=d.ids;ON.seq=d.seq||0;ON.on=true;$o('res').hidden=true;$o('mode').hidden=true;
  HOOK.set(d.state);oconnect(NAMES[d.me]||'Player',d.host,true)}
+function canSkip(){const g=ON.gT&&ON.gT[ON.ids[cur]];return !!g&&Date.now()-g>8000&&!out[cur]}
+function oclaim(k){const sp=ON.seats;if(!sp)return;ON.id=sp.ids[k];ON.me=k;ON.ids=sp.ids;ON.seq=-1;ON.on=true;try{ON.sb.removeChannel(ON.ch)}catch(e){}ON.ch=null;ON.seats=null;$o('onl').hidden=true;oconnect(sp.names[k],false,true)}
 function resumeAny(){OSAVED?orejoin():resume(SAVED)}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&ON.on)osend('hello',{})});
 function oleave(){try{localStorage.removeItem('ol-'+HOOK.key)}catch(e){}if(ON.ch){try{ON.sb.removeChannel(ON.ch)}catch(e){}}ON.ch=null;ON.on=false;ON.me=-1;ON.peers=[]}
 const SAVED=load();
 build();reset(2);drawSetup();
 {const d=SAVED;if(d&&d.sc&&d.NAMES&&d.dice){document.getElementById('mode').hidden=true;document.getElementById('rsum').textContent=d.NAMES.slice(0,d.NP).join(', ')+' · '+d.sc.slice(0,d.NP).reduce((n,a)=>n+a.filter(v=>v!=null).length,0)+' scores entered';document.getElementById('res').hidden=false}}addEventListener("resize",()=>els.forEach((_,i)=>place(i)));
-if(OSAVED&&OSAVED.state&&!new URLSearchParams(location.search).get('room')){$o('mode').hidden=true;$o('rsum').textContent='Online game · room '+OSAVED.code+' · '+OSAVED.state.NAMES.slice(0,OSAVED.state.NP).join(', ');$o('res').hidden=false}
-{const q=new URLSearchParams(location.search).get('room');if(q){showOnline();$o('ocd').value=q.toUpperCase().slice(0,4)}}
+{const q=(new URLSearchParams(location.search).get('room')||'').toUpperCase();
+ if(OSAVED&&OSAVED.state&&(!q||q==OSAVED.code)){if(q)orejoin();else{$o('mode').hidden=true;$o('rsum').textContent='Online game · room '+OSAVED.code+' · '+OSAVED.state.NAMES.slice(0,OSAVED.state.NP).join(', ');$o('res').hidden=false}}
+ else if(q){showOnline();$o('ocd').value=q.slice(0,4)}}
 </script></body></html>

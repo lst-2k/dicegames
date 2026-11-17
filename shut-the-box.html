@@ -51,49 +51,12 @@ body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 Georgia,"Times
 .box input{display:block;width:100%;box-sizing:border-box;margin:6px 0;padding:9px 10px;font:1em Georgia,serif;border-radius:8px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
 #oshare{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}#oshare button,#opl{margin-top:8px}#opl{line-height:1.7}
 </style></head><body>
-<!-- Floating Menu Button & Popup (Top Left) -->
-<div id="portal-menu-container" style="position: fixed; top: 12px; left: 25px; z-index: 9999; font-family: sans-serif;">
-    
-    <!-- 3-Line Square Menu Button -->
-    <button onclick="togglePortalMenu()" 
-            title="Menu"
-            style="width: 42px; height: 42px; background: #061811; color: #d4af37; border: 2px solid #d4af37; border-radius: 8px; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
-        <span style="width: 20px; height: 2px; background-color: #d4af37; border-radius: 2px; transition: 0.3s;"></span>
-        <span style="width: 20px; height: 2px; background-color: #d4af37; border-radius: 2px; transition: 0.3s;"></span>
-        <span style="width: 20px; height: 2px; background-color: #d4af37; border-radius: 2px; transition: 0.3s;"></span>
-    </button>
-
-    <!-- Hidden Dropdown Menu (Opens Downward) -->
-    <div id="portal-menu-dropdown" style="display: none; margin-top: 10px; background: #061811; border: 2px solid #d4af37; border-radius: 10px; padding: 8px; box-shadow: 0 8px 20px rgba(0,0,0,0.6); min-width: 150px;">
-        <a href="https://lst-2k.github.io/mindgames/" 
-           style="display: flex; align-items: center; justify-content: center; gap: 8px; color: #d4af37; text-decoration: none; font-size: 13px; font-weight: bold; padding: 8px 12px; border-radius: 6px; background: rgba(212, 175, 55, 0.1); transition: background 0.2s;"
-           onmouseover="this.style.background='rgba(212, 175, 55, 0.25)'" 
-           onmouseout="this.style.background='rgba(212, 175, 55, 0.1)'">
-           ← Back to Games
-        </a>
-    </div>
-</div>
-
-<script>
-    function togglePortalMenu() {
-        const menu = document.getElementById('portal-menu-dropdown');
-        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
-    }
-
-    // Close menu when clicking outside of it
-    document.addEventListener('click', function(event) {
-        const container = document.getElementById('portal-menu-container');
-        if (container && !container.contains(event.target)) {
-            document.getElementById('portal-menu-dropdown').style.display = 'none';
-        }
-    });
-</script>
 <div id="app">
  <div class="gt">Shut the Box</div>
  <div class="top" id="top"></div>
  <div class="wood"><div id="box"></div></div>
  <div class="felt"><div id="tbl"><div class="cs"></div><button id="cup" onclick="roll()"><svg viewBox="0 0 84 100" aria-hidden="true"><defs><linearGradient id="cg" x1="0" x2="1"><stop offset="0" stop-color="#6b4c0c"/><stop offset=".4" stop-color="#f2d36f"/><stop offset=".7" stop-color="#a8801c"/><stop offset="1" stop-color="#5e420a"/></linearGradient></defs><path d="M0 13 L11 92 C14 101 70 101 73 92 L84 13 Z" fill="#7a4a24"/><path d="M4.3 44 L79.7 44 L80.3 50 L3.7 50 Z" fill="url(#cg)"/><ellipse cx="42" cy="13" rx="40.5" ry="11" fill="#1a0e05" stroke="#e2b94a" stroke-width="3"/><ellipse cx="42" cy="15" rx="34" ry="6.5" fill="#050200"/></svg><span id="cl">Roll</span></button></div>
-  <div id="info"></div><div style="text-align:center"><button class="nb" id="nx" hidden onclick="nextP()">Next player ▶</button></div></div>
+  <div id="info"></div><div style="text-align:center"><button class="nb" id="skipb" hidden onclick="skipP()"></button> <button class="nb" id="nx" hidden onclick="nextP()">Next player ▶</button></div></div>
  <div class="ctr"><button class="nb" onclick="askNew()">New game</button> <button class="nb" id="snd" onclick="mute()">Sound: on</button></div>
 </div>
 <div id="cf" hidden><span id="cft"></span><button class="no" onclick="clr()">Clear</button></div>
@@ -111,7 +74,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 Georgia,"Times
 const PIPS={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
 const BASE={1:[0,0],6:[0,180],2:[0,-90],5:[0,90],3:[-90,0],4:[90,0]};
 const NAMES=['Player 1','Player 2','Player 3','Player 4'],COL=['#2f6fd6','#c9503f','#8a4fc2','#d98b1f'],CUPTOP=215,KEY='stb-save';
-let NT=9,SELT=9,lock=0,typed=['','','',''],SEL=2,SELR=1,NP=2,R=1,tiles,tot,cur,round,phase,total=0,dv=[1,2],nDice=2,sel=[],busy=0,done=false,msg='';
+let out=[false,false,false,false],NT=9,SELT=9,lock=0,typed=['','','',''],SEL=2,SELR=1,NP=2,R=1,tiles,tot,cur,round,phase,total=0,dv=[1,2],nDice=2,sel=[],busy=0,done=false,msg='';
 let ax=[0,0],ay=[0,0],tp=[null,null],ta=[0,0],els=[],AC=null,muted=false;
 const $=id=>document.getElementById(id),W=()=>$('tbl').clientWidth;
 function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
@@ -135,12 +98,14 @@ function canMove(t){const o=[];tiles.forEach((x,i)=>{if(x)o.push(i+1)});for(let 
 const want=()=>tiles.slice(6).some(Boolean)?2:1;
 function newTurn(){tiles=Array(NT).fill(true);phase='roll';sel=[];tp=[null,null];dv=[1,2];[0,1].forEach(i=>{ax[i]=BASE[dv[i]][0];ay[i]=BASE[dv[i]][1]})}
 function buildTiles(){const b=$('box');b.innerHTML='';b.style.setProperty('--n',NT==12?6:9);b.className=NT==12?'big':'';for(let n=1;n<=NT;n++){const t=document.createElement('div');t.className='t';t.textContent=n;t.onclick=()=>tap(n);b.appendChild(t)}}
-function reset(n,r,t){if(n){NP=n;R=r;NT=t||9}buildTiles();tot=[0,0,0,0];cur=0;round=1;done=false;msg='';newTurn();['over','mode','conf','res'].forEach(k=>$(k).hidden=true);render()}
+function reset(n,r,t){if(n){NP=n;R=r;NT=t||9}buildTiles();out=[false,false,false,false];tot=[0,0,0,0];cur=0;round=1;done=false;msg='';newTurn();['over','mode','conf','res'].forEach(k=>$(k).hidden=true);render()}
 function endTurn(box){const s=sumOpen();tot[cur]+=s;phase='next';msg=box?'SHUT THE BOX! 0 points.':'No moves possible. You score '+s+' point'+(s==1?'':'s')+'.';box?(sWin(),confetti()):sLose();if(NP==1&&round>=R)setTimeout(()=>{if(phase=='next'&&!done)finish()},box?3500:2500)}
-function nextP(){if(phase!='next'||!mine())return;cur++;if(cur>=NP){cur=0;round++}if(round>R){osend('fin',{tot});finish();return}newTurn();osend('state',snap());render()}
-function finish(){done=true;const r=[...Array(NP).keys()].map(p=>[p,tot[p]]).sort((a,b)=>a[1]-b[1]);const w=r.filter(x=>x[1]==r[0][1]);
+function advance(){do{cur++;if(cur>=NP){cur=0;round++}}while(round<=R&&out[cur]);if(round>R)return false;newTurn();return true}
+function nextP(){if(phase!='next'||!mine())return;if(!advance()){osend('fin',{tot,out});finish();return}osend('state',snap());render()}
+function skipP(){if(!ON.on||mine()||!canSkip())return;if(!confirm('Remove '+NAMES[cur]+' from the game and continue without them?'))return;out[cur]=true;const ok=advance();osend('skip',{out,tot,fin:!ok,s:snap()});if(ok)render();else finish()}
+function finish(){done=true;const r=[...Array(NP).keys()].filter(p=>!out[p]).map(p=>[p,tot[p]]).sort((a,b)=>a[1]-b[1]);const w=r.filter(x=>x[1]==r[0][1]);
  $('win').textContent=NP==1?'Game over':w.length>1?'It’s a tie: '+w.map(x=>NAMES[x[0]]).join(' & '):NAMES[r[0][0]]+' wins!';
- $('fin').innerHTML=r.map(x=>esc(NAMES[x[0]])+' · '+x[1]+' pts').join('<br>')+'<div style="opacity:.7;margin-top:6px">Lowest score wins</div>';
+ $('fin').innerHTML=r.map(x=>esc(NAMES[x[0]])+' · '+x[1]+' pts').join('<br>')+[...Array(NP).keys()].filter(p=>out[p]).map(p=>'<br>'+esc(NAMES[p])+' · left the game').join('')+'<div style="opacity:.7;margin-top:6px">Lowest score wins</div>';
  clearSave();render();$('over').hidden=false}
 function tap(n){if(phase!='pick'||busy||lock||!mine()||!tiles[n-1])return;const i=sel.indexOf(n);i>=0?sel.splice(i,1):sel.push(n);sBlip();osend('sel',sel);render();if(sel.reduce((a,b)=>a+b,0)==total){lock=1;setTimeout(()=>{lock=0;shut()},450)}}
 function shut(){if(phase!='pick'||!mine()||sel.reduce((a,b)=>a+b,0)!=total)return;sel.forEach(n=>tiles[n-1]=false);sel=[];sShut();if(!sumOpen())endTurn(true);else phase='roll';osend('state',snap());render()}
@@ -165,13 +130,15 @@ function roll(f){
 }
 /* ui */
 function render(){
- $('top').innerHTML=[...Array(NP).keys()].map(p=>'<div class="pl'+(p==cur?' on':'')+'" style="border-left:6px solid '+COL[p]+'"><span>'+esc(NAMES[p])+'</span><b>'+tot[p]+' pts</b></div>').join('');
+ $('top').innerHTML=[...Array(NP).keys()].map(p=>'<div class="pl'+(p==cur?' on':'')+'" style="border-left:6px solid '+COL[p]+'"><span>'+esc(NAMES[p])+(out[p]?' (left)':'')+'</span><b>'+tot[p]+' pts</b></div>').join('');
  [...$('box').children].forEach((t,i)=>{t.classList.toggle('shut',!tiles[i]);t.classList.toggle('sel',sel.includes(i+1))});
  if(!busy)els.forEach((_,i)=>place(i));
  $('cl').textContent='Roll';$('cup').disabled=busy||phase!='roll'||!mine();
  const who=NP>1?NAMES[cur]+': ':'',n=phase=='roll'?want():nDice;
  $('info').textContent=busy?'Rolling…':phase=='roll'?who+'Round '+round+'/'+R+' · shake the cup ('+n+(n==1?' die':' dice')+')':phase=='pick'?who+'You rolled '+total+'. Tap tiles that add up to '+total+'.':msg;
  if(ON.on&&!mine()&&!busy&&(phase=='roll'||phase=='pick'))$('info').textContent=NAMES[cur]+' is playing…';
+ if(ON.on&&ON.gone&&ON.gone[cur]&&!mine()&&!busy)$('info').textContent=NAMES[cur]+' has disconnected. Waiting for them to rejoin…';
+ {const sb=document.getElementById('skipb'),sk=ON.on&&!mine()&&canSkip();sb.hidden=!sk;if(sk)sb.textContent='Remove '+NAMES[cur]+' and continue'}
  $('nx').hidden=phase!='next'||!mine()||(NP==1&&round>=R);$('nx').textContent=NP==1?'Next round ▶':'Next player ▶';
  const ok=phase=='pick'&&sel.length&&!busy&&mine();$('cf').hidden=!ok;
  if(ok){const s=sel.reduce((a,b)=>a+b,0);$('cft').textContent=[...sel].sort((a,b)=>a-b).join(' + ')+' = '+s+(s==total?'':' (need '+total+')')}
@@ -189,13 +156,13 @@ function save(){if(ON.on){osave();return}try{if(done||!inProgress())localStorage
 function clearSave(){try{localStorage.removeItem(KEY);localStorage.removeItem('ol-'+HOOK.key)}catch(e){}}
 function load(){try{return JSON.parse(localStorage.getItem(KEY))}catch(e){return null}}
 function askNew(){if(inProgress()&&!done)$('conf').hidden=false;else showSetup()}
-function resume(d){if(!d)return;NP=d.NP;NT=d.NT||9;buildTiles();d.NAMES.forEach((n,i)=>NAMES[i]=n);R=d.R;round=d.round;cur=d.cur;tot=d.tot;tiles=d.tiles;phase=d.phase;dv=d.dv;nDice=d.nDice;total=d.total;msg=d.msg;sel=[];busy=0;done=false;
+function resume(d){if(!d)return;NP=d.NP;out=d.out||[false,false,false,false];NT=d.NT||9;buildTiles();d.NAMES.forEach((n,i)=>NAMES[i]=n);R=d.R;round=d.round;cur=d.cur;tot=d.tot;tiles=d.tiles;phase=d.phase;dv=d.dv;nDice=d.nDice;total=d.total;msg=d.msg;sel=[];busy=0;done=false;
  tp=[null,null];dv.forEach((v,i)=>{ax[i]=BASE[v][0];ay[i]=BASE[v][1]});if(phase!='roll')for(let i=0;i<nDice;i++){tp[i]=rand(i);ta[i]=Math.round(Math.random()*80-40)}
  ['res','mode','over','conf'].forEach(k=>$(k).hidden=true);render();if(phase=='next'&&NP==1&&round>=R)setTimeout(()=>{if(phase=='next'&&!done)finish()},1500)}
-const HOOK={full:()=>({NP,NT,NAMES,R,round,cur,tot,tiles,phase,dv,nDice,total,msg}),set:d=>resume(d),key:'stb',file:'shut-the-box.html',title:'Shut the Box',opts:()=>({R:SELR,NT:SELT}),start:p=>reset(p.ids.length,p.R,p.NT),
- ev(t,p){if(t=='roll')roll(p);else if(t=='sel'){sel=p;render()}else if(t=='state')applyState(p);else if(t=='fin'){tot=p.tot;finish()}}};
-const snap=()=>({tiles,tot,cur,round,phase,total,msg,sel});
-function applyState(s){const nt=s.cur!=cur||s.round!=round,was=phase;cur=s.cur;round=s.round;tot=s.tot;tiles=s.tiles;phase=s.phase;total=s.total;msg=s.msg;sel=s.sel||[];if(nt)tp=[null,null];render();if(phase=='next'&&was!='next'&&/SHUT/.test(msg)){sWin();confetti()}}
+const HOOK={full:()=>({out,NP,NT,NAMES,R,round,cur,tot,tiles,phase,dv,nDice,total,msg}),set:d=>resume(d),key:'stb',file:'shut-the-box.html',title:'Shut the Box',opts:()=>({R:SELR,NT:SELT}),start:p=>reset(p.ids.length,p.R,p.NT),
+ ev(t,p){if(t=='roll')roll(p);else if(t=='sel'){sel=p;render()}else if(t=='state')applyState(p);else if(t=='fin'){tot=p.tot;out=p.out||out;finish()}else if(t=='skip'){out=p.out;tot=p.tot;if(p.fin)finish();else applyState(p.s)}}};
+const snap=()=>({tiles,tot,cur,round,phase,total,msg,sel,out});
+function applyState(s){out=s.out||out;const nt=s.cur!=cur||s.round!=round,was=phase;cur=s.cur;round=s.round;tot=s.tot;tiles=s.tiles;phase=s.phase;total=s.total;msg=s.msg;sel=s.sel||[];if(nt)tp=[null,null];render();if(phase=='next'&&was!='next'&&/SHUT/.test(msg)){sWin();confetti()}}
 function clr(){if(!mine())return;sel=[];osend('sel',sel);render()}
 
 /* ---- online play (Supabase Realtime Broadcast + Presence) ---- */
@@ -203,7 +170,7 @@ const SB_URL='https://ajsausfqqmjglkapornk.supabase.co',SB_KEY='sb_publishable_2
 const $o=id=>document.getElementById(id);
 const ON={seq:0,on:false,me:-1,host:false,code:'',ch:null,sb:null,peers:[],ids:[],id:Math.random().toString(36).slice(2,9)};
 const mine=()=>!ON.on||ON.me==cur;
-function osend(t,p){if(!(ON.ch&&(ON.on||t=='start')))return;const n=(t=='hello'||t=='full'||t=='start')?ON.seq:++ON.seq;ON.ch.send({type:'broadcast',event:'g',payload:{t,p,from:ON.id,n}})}
+function osend(t,p){if(!(ON.ch&&(ON.on||t=='start'||t=='who')))return;const n=(t=='hello'||t=='full'||t=='start'||t=='who'||t=='seats')?ON.seq:++ON.seq;ON.ch.send({type:'broadcast',event:'g',payload:{t,p,from:ON.id,n}})}
 function oerr(m){$o('oerr').textContent=m||''}
 function showOnline(){$o('mode').hidden=true;$o('res').hidden=true;$o('o1').hidden=false;$o('o2').hidden=true;oerr();$o('onl').hidden=false}
 function rcode(){const a='ABCDEFGHJKLMNPQRSTUVWXYZ';let s='';for(let i=0;i<4;i++)s+=a[Math.floor(Math.random()*a.length)];return s}
@@ -214,14 +181,16 @@ function oconnect(name,host,re){
  if(!re)oleave();ON.host=host;ON.sb=ON.sb||supabase.createClient(SB_URL,SB_KEY);
  const ch=ON.ch=ON.sb.channel('game-'+HOOK.key+'-'+ON.code,{config:{broadcast:{self:false},presence:{key:ON.id}}});
  ch.on('broadcast',{event:'g'},({payload})=>oget(payload))
-  .on('presence',{event:'sync'},()=>{const s=ch.presenceState();ON.peers=Object.entries(s).map(([k,v])=>({id:k,name:v[0].name,host:v[0].host,t:v[0].t})).sort((a,b)=>(b.host?1:0)-(a.host?1:0)||a.t-b.t);olobby()})
-  .subscribe(async st=>{if(st=='SUBSCRIBED'){await ch.track({name,host,t:Date.now()});olobby();if(ON.on)osend('hello',{})}else if(st=='CHANNEL_ERROR'||st=='TIMED_OUT')oerr('Could not connect. Try again.')});
+  .on('presence',{event:'sync'},()=>{const s=ch.presenceState();ON.peers=Object.entries(s).map(([k,v])=>({id:k,name:v[0].name,host:v[0].host,t:v[0].t})).sort((a,b)=>(b.host?1:0)-(a.host?1:0)||a.t-b.t);if(ON.on){ON.gone=ON.ids.map(id=>!ON.peers.some(p=>p.id==id));ON.gT=ON.gT||{};ON.ids.forEach((id,k)=>{if(ON.gone[k]){if(!ON.gT[id])ON.gT[id]=Date.now()}else delete ON.gT[id]});if(ON.gone.some(Boolean))setTimeout(()=>{if(ON.on)render()},8500);render()}olobby()})
+  .subscribe(async st=>{if(st=='SUBSCRIBED'){await ch.track({name,host,t:Date.now()});olobby();if(ON.on)osend('hello',{});else osend('who',{})}else if(st=='CHANNEL_ERROR'||st=='TIMED_OUT')oerr('Could not connect. Try again.')});
  $o('o1').hidden=true;$o('o2').hidden=false;$o('ocode').textContent=ON.code;
  $o('oshare').innerHTML=(navigator.share?'<button class="nb" onclick="oshare()">Share…</button>':'')+'<button class="nb" onclick="oshare(\'wa\')">WhatsApp</button><button class="nb" onclick="oshare(\'sms\')">SMS</button><button class="nb" onclick="oshare(\'copy\')">Copy link</button>';
  $o('ocp').textContent=host?'Send the invite to your friends':'';
 }
 function olobby(){if(ON.on||!ON.ch)return;
  $o('opl').innerHTML=ON.peers.map((p,i)=>'<div>'+(i+1)+'. '+esc(p.name)+(p.host?' (host)':'')+'</div>').join('');
+ if(ON.seats){const free=ON.seats.ids.map((id,k)=>({id,k,n:ON.seats.names[k]})).filter(x=>!ON.peers.some(p=>p.id==x.id));
+  $o('ost').hidden=true;$o('owait').innerHTML='This game has already started. Tap your name to rejoin:<br>'+(free.length?free.map(x=>'<button class="nb" onclick="oclaim('+x.k+')">'+esc(x.n)+'</button>').join(' '):'No free seats.');return}
  const ready=ON.peers.some(p=>p.host);
  $o('ost').hidden=!ON.host;$o('ost').disabled=ON.peers.length<2;
  $o('owait').textContent=ON.host?(ON.peers.length<2?'Waiting for players to join…':'Ready when you are.'):ready?'Waiting for the host to start…':'Looking for the host…'}
@@ -235,7 +204,8 @@ function ostartGame(){const pr=ON.peers.slice(0,4);if(pr.length<2)return;const p
 function ostart(p){ON.seq=0;ON.on=true;ON.ids=p.ids;ON.me=p.ids.indexOf(ON.id);p.names.forEach((n,i)=>NAMES[i]=n);$o('onl').hidden=true;HOOK.start(p)}
 function oget(m){if(!m||m.from==ON.id)return;
  if(m.t=='start'&&!ON.on){ostart(m.p);return}
- if(!ON.on)return;
+ if(!ON.on){if(m.t=='seats'){ON.seats=m.p;olobby()}return}
+ if(m.t=='who'){osend('seats',{names:NAMES.slice(0,NP),ids:ON.ids});return}
  if(m.t=='hello'){if(ON.seq>m.n)osend('full',{s:HOOK.full()});else if(ON.seq<m.n)osend('hello',{});return}
  if(m.t=='full'){if(m.n>ON.seq){ON.seq=m.n;HOOK.set(m.p.s)}return}
  if(m.n>ON.seq+1){osend('hello',{});return}
@@ -245,6 +215,8 @@ const OSAVED=(()=>{try{return JSON.parse(localStorage.getItem('ol-'+HOOK.key))}c
 function orejoin(){const d=OSAVED;if(!d)return;if(typeof supabase==='undefined'){alert('Online play could not load. Check your connection.');return}
  ON.id=d.id;ON.code=d.code;ON.me=d.me;ON.ids=d.ids;ON.seq=d.seq||0;ON.on=true;$o('res').hidden=true;$o('mode').hidden=true;
  HOOK.set(d.state);oconnect(NAMES[d.me]||'Player',d.host,true)}
+function canSkip(){const g=ON.gT&&ON.gT[ON.ids[cur]];return !!g&&Date.now()-g>8000&&!out[cur]}
+function oclaim(k){const sp=ON.seats;if(!sp)return;ON.id=sp.ids[k];ON.me=k;ON.ids=sp.ids;ON.seq=-1;ON.on=true;try{ON.sb.removeChannel(ON.ch)}catch(e){}ON.ch=null;ON.seats=null;$o('onl').hidden=true;oconnect(sp.names[k],false,true)}
 function resumeAny(){OSAVED?orejoin():resume(SAVED)}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&ON.on)osend('hello',{})});
 function oleave(){try{localStorage.removeItem('ol-'+HOOK.key)}catch(e){}if(ON.ch){try{ON.sb.removeChannel(ON.ch)}catch(e){}}ON.ch=null;ON.on=false;ON.me=-1;ON.peers=[]}
@@ -252,6 +224,7 @@ const SAVED=load();
 build();reset(2,1);drawSetup();$('mode').hidden=false;
 if(SAVED&&SAVED.tiles&&SAVED.tot){$('mode').hidden=true;$('rsum').textContent=SAVED.NAMES.slice(0,SAVED.NP).join(', ')+' · round '+SAVED.round+' of '+SAVED.R;$('res').hidden=false}
 addEventListener('resize',()=>els.forEach((_,i)=>place(i)));
-if(OSAVED&&OSAVED.state&&!new URLSearchParams(location.search).get('room')){$o('mode').hidden=true;$o('rsum').textContent='Online game · room '+OSAVED.code+' · '+OSAVED.state.NAMES.slice(0,OSAVED.state.NP).join(', ');$o('res').hidden=false}
-{const q=new URLSearchParams(location.search).get('room');if(q){showOnline();$o('ocd').value=q.toUpperCase().slice(0,4)}}
+{const q=(new URLSearchParams(location.search).get('room')||'').toUpperCase();
+ if(OSAVED&&OSAVED.state&&(!q||q==OSAVED.code)){if(q)orejoin();else{$o('mode').hidden=true;$o('rsum').textContent='Online game · room '+OSAVED.code+' · '+OSAVED.state.NAMES.slice(0,OSAVED.state.NP).join(', ');$o('res').hidden=false}}
+ else if(q){showOnline();$o('ocd').value=q.slice(0,4)}}
 </script></body></html>
